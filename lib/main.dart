@@ -20,13 +20,11 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: appTheme,
-      // initialRoute: '/auth',
-      // getPages: [
-      //   GetPage(name: '/auth', page: () => AuthScreen()),
-      //   GetPage(name: '/dashboard', page: () => DashboardScreen(userRole: '',))
-      // ],
-      home: DashboardScreen(userRole: '',),
-      
+      initialRoute: '/auth',
+      getPages: [
+        GetPage(name: '/auth', page: () => AuthScreen()),
+        GetPage(name: '/dashboard', page: () => DashboardScreen(userRole: '',))
+      ],   
     );
   }
 }
