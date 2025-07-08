@@ -1,0 +1,58 @@
+import 'package:flutter/material.dart';
+import '../theme/theme.dart';
+
+class CustomTextField extends StatelessWidget {
+  final String label;   
+  final String hintText;  
+  final bool obscureText;   
+  final TextEditingController? controller;  
+  final TextInputType keyboardType;   
+
+  const CustomTextField({
+    super.key,
+    required this.label,
+    this.hintText = '',   
+    this.obscureText = false,   
+    this.controller,
+      this.keyboardType = TextInputType.text,   
+    });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,   
+      children: [
+        Text(
+          label,
+          style: AppTextStyles.textFieldLabel,  
+        ),
+        const SizedBox(height: 8.0),  
+        TextField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          style: TextStyle(color: AppColors.textDark),  
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: TextStyle(color: AppColors.textLight),   
+            filled: true,
+            fillColor: AppColors.cardBackground,  
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0), 
+            border: OutlineInputBorder(   
+              borderRadius: BorderRadius.circular(10.0),  
+              borderSide: BorderSide(color: AppColors.textFieldBorder, width: 1.0),   
+            ),
+            enabledBorder: OutlineInputBorder(  
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: AppColors.textFieldBorder, width: 1.0),
+            ),
+            focusedBorder: OutlineInputBorder(  
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(color: AppColors.primaryBlue, width: 2.0), 
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
