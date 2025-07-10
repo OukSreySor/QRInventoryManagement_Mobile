@@ -13,9 +13,11 @@ class RegisterRequestDTO {
 
   Map<String, dynamic> toJson() {
     return {
-      'username': username,
-      'email': email,
-      'password': password,
+      'userDto': {
+        'username': username,
+        'email': email,
+        'password': password,
+      },
       'inviteCode': inviteCode
     };
   }

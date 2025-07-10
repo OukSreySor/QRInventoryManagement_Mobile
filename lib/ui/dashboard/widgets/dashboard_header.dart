@@ -4,7 +4,9 @@ import '../../../theme/theme.dart';
 
 class DashboardHeader extends StatelessWidget {
   final String subtitle;
-  const DashboardHeader({super.key, required this.subtitle});
+  final VoidCallback? onLogout;
+
+  const DashboardHeader({super.key, required this.subtitle, this.onLogout});
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +29,31 @@ class DashboardHeader extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 6.0),
-        Text(
-          subtitle,
-          style: AppTextStyles.subtitle,
+        Row(
+          mainAxisAlignment: 
+            onLogout != null ? MainAxisAlignment.spaceBetween : MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Text(
+                subtitle,
+                style: AppTextStyles.subtitle,
+                textAlign: onLogout != null ? TextAlign.start : TextAlign.center,
+              ),
+            ),
+            if (onLogout != null) 
+              IconButton(
+                onPressed: onLogout, 
+                icon: const Icon(
+                  LucideIcons.logOut,
+                  color: AppColors.primaryBlue,
+                  size: 24,
+                ),
+                tooltip: 'Logout',
+              )
+          ],
         ),
       ],
     );
   }
 }
+

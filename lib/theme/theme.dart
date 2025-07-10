@@ -16,9 +16,9 @@ class AppColors {
   static const Color bannerGradientEnd = Color(0xFF8A6CFB);
 
   static const Color purpleIcon = Color(0xFF6A1B9A);
-  static const Color greenIcon = Color(0xFF4CAF50);
-  static const Color pinkRedIcon = Color(0xFFD81B60);
-  static const Color orangeIcon = Color(0xFFFB8C00);
+  static const Color greenIcon = Color(0xFF16A34A);
+  static const Color pinkRedIcon = Color(0xFFEF4444);
+  static const Color orangeIcon = Color(0xFFF47914);
 
   static const Color buttonDark = Color(0xFF212121); 
   static const Color textFieldBorder = Color(0xFFE2E8F0); 

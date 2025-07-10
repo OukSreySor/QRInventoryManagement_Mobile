@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:qr_inventory_management/controllers/auth_controller.dart';
 import '../../theme/theme.dart';
 import 'widgets/dashboard_header.dart';
 import 'widgets/navigation_tabs.dart';
@@ -10,10 +12,15 @@ import 'widgets/call_to_action_banner.dart';
 class DashboardScreen extends StatelessWidget {
   final String userRole;
 
-  const DashboardScreen({super.key, required this.userRole});
-
+  DashboardScreen({super.key, required this.userRole}){
+    if (!Get.isRegistered<AuthController>()) {
+        Get.put(AuthController());
+      }
+  }
+    
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
       body: SingleChildScrollView(
@@ -21,7 +28,12 @@ class DashboardScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DashboardHeader(subtitle: _getSubtitle(userRole)),
+            DashboardHeader(
+              subtitle: _getSubtitle(userRole),
+              onLogout: () {
+                Get.find<AuthController>().logout();
+              },
+            ),
             const SizedBox(height: 28.0),
             const NavigationTabs(),
             const SizedBox(height: 28.0),

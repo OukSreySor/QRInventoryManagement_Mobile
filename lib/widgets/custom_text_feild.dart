@@ -5,17 +5,19 @@ class CustomTextField extends StatelessWidget {
   final String label;   
   final String hintText;  
   final bool obscureText;   
-  final TextEditingController? controller;  
-  final TextInputType keyboardType;   
+  final TextEditingController controller;  
+  final TextInputType keyboardType;  
+  final String? Function(String?)? validator; 
 
   const CustomTextField({
     super.key,
     required this.label,
-    this.hintText = '',   
+    required this.hintText,   
     this.obscureText = false,   
-    this.controller,
-      this.keyboardType = TextInputType.text,   
-    });
+    required this.controller,
+    this.keyboardType = TextInputType.text,  
+    this.validator 
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +29,12 @@ class CustomTextField extends StatelessWidget {
           style: AppTextStyles.textFieldLabel,  
         ),
         const SizedBox(height: 8.0),  
-        TextField(
+        TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
-          style: TextStyle(color: AppColors.textDark),  
+          validator: validator,
+          style: TextStyle(color: AppColors.textBlack),  
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(color: AppColors.textLight),   
@@ -48,7 +51,7 @@ class CustomTextField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(  
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: AppColors.primaryBlue, width: 2.0), 
+              borderSide: BorderSide(color: AppColors.primaryBlue, width: 1.0), 
             ),
           ),
         ),
