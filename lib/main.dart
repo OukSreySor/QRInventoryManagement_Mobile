@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:qr_inventory_management/bindings/initial_binding.dart';
 import 'package:qr_inventory_management/ui/auth/auth_screen.dart';
 import 'package:qr_inventory_management/ui/dashboard/dashboard.dart';
 import 'theme/theme.dart';
@@ -20,10 +21,11 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: appTheme,
+      initialBinding: InitialBinding(),
       initialRoute: '/auth',
       getPages: [
         GetPage(name: '/auth', page: () => AuthScreen()),
-        GetPage(name: '/dashboard', page: () => DashboardScreen(userRole: '',))
+        GetPage(name: '/dashboard', page: () => DashboardScreen())
       ],   
     );
   }
