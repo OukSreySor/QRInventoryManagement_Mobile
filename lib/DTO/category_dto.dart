@@ -15,7 +15,8 @@ class CategoryDTO {
               .toList()
           : null,
       userId: json['userId'],
-      user: json['user'] != null ? UserDTO.fromJson(json['user']) : null,
+      user: json['user'] != null ? UserDTO.fromJson(json['user']) : null, 
+      createdAt: json['createAt'],
     );
   }
 

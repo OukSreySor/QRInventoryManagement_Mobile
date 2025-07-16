@@ -8,6 +8,7 @@ class Category {
   List<Product>? products;
   String userId; 
   User? user;
+  DateTime createdAt;
 
   Category({
     required this.id,
@@ -16,29 +17,11 @@ class Category {
     this.products,
     required this.userId,
     this.user,
+    required this.createdAt
   });
 
-  // factory Category.fromJson(Map<String, dynamic> json) {
-  //   return Category(
-  //     id: json['id'],
-  //     name: json['name'],
-  //     description: json['description'],
-  //     products: json['products'] != null
-  //         ? List<Product>.from(json['products'].map((x) => Product.fromJson(x)))
-  //         : null,
-  //     userId: json['userId'],
-  //     user: json['user'] != null ? User.fromJson(json['user']) : null,
-  //   );
-  // }
+  String get formattedCreatedAt {
+    return '${createdAt.month}/${createdAt.day}/${createdAt.year}';
+  }
 
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     'id': id,
-  //     'name': name,
-  //     'description': description,
-  //     'products': products?.map((x) => x.toJson()).toList(),
-  //     'userId': userId,
-  //     'user': user?.toJson(),
-  //   };
-  // }
 }

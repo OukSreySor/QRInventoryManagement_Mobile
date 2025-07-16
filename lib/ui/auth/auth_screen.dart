@@ -10,7 +10,7 @@ import '../../utils/snackbar_helper.dart';
 import 'widgets/auth_tab_selector.dart';
 import 'widgets/company_tab_selector.dart';
 import '../../widgets/custom_text_feild.dart';
-import '../dashboard/widgets/dashboard_header.dart';
+import '../../widgets/dashboard_header.dart';
 import '../../widgets/primary_button.dart';
 
 class AuthScreen extends StatefulWidget {

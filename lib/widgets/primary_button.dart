@@ -25,9 +25,8 @@ class PrimaryButton extends StatelessWidget {
           backgroundColor: backgroundColor, 
           padding: const EdgeInsets.symmetric(vertical: 16.0),  
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),  
+            borderRadius: BorderRadius.circular(8.0),  
           ),
-          elevation: 5,   
           shadowColor: backgroundColor,
         ),
         child: Text(

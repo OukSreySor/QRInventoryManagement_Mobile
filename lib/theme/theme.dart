@@ -7,7 +7,7 @@ class AppColors {
   static const Color lightBackground = Color(0xFFE7EEFF); 
   static const Color cardBackground = Colors.white; 
   static const Color textDark = Color(0xFF4B5563); 
-  static Color textMedium = Color(0xFF757575);
+  static Color textMedium = Color(0xFF757575); 
   static Color textLight = Color(0xFF9E9E9E); 
   static const Color textWhite = Colors.white; 
   static const Color textBlack = Colors.black; 
@@ -19,6 +19,7 @@ class AppColors {
   static const Color greenIcon = Color(0xFF16A34A);
   static const Color pinkRedIcon = Color(0xFFEF4444);
   static const Color orangeIcon = Color(0xFFF47914);
+  static const Color darkBlue = Color(0xFF133782);
 
   static const Color buttonDark = Color(0xFF212121); 
   static const Color textFieldBorder = Color(0xFFE2E8F0); 
@@ -42,13 +43,13 @@ class AppTextStyles {
   );
 
   static TextStyle tabSelected = GoogleFonts.montserrat(
-    fontSize: 15,
-    fontWeight: FontWeight.w700,
-    color: AppColors.primaryBlue,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textBlack,
   );
 
   static TextStyle tabUnselected = GoogleFonts.montserrat(
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: FontWeight.w500,
     color: AppColors.textDark,
   );
@@ -90,7 +91,7 @@ class AppTextStyles {
   );
 
   static TextStyle authSectionTitle = GoogleFonts.montserrat(
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: FontWeight.w700,
     color: AppColors.textBlack,
   );
@@ -104,11 +105,11 @@ class AppTextStyles {
   static TextStyle textFieldLabel = GoogleFonts.montserrat(
     fontSize: 14,
     fontWeight: FontWeight.w500,
-    color: AppColors.textDark,
+    color: AppColors.textBlack,
   );
 
   static TextStyle buttonText = GoogleFonts.montserrat(
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: FontWeight.w600,
     color: AppColors.textWhite,
   );
@@ -118,6 +119,33 @@ class AppTextStyles {
     fontWeight: FontWeight.w600,
     color: AppColors.textDark,
   );
+
+  static TextStyle cardHeader = GoogleFonts.montserrat(
+    fontSize: 17,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textBlack,
+  );
+
+  static TextStyle titleStyle = GoogleFonts.montserrat(
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textBlack,
+  );
+
+  static TextStyle labelStyle = GoogleFonts.montserrat(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textBlack,
+  );
+
+  static TextStyle valueStyle = GoogleFonts.montserrat(
+    fontSize: 13,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textBlack,
+  );
+
+  
+  
 }
 
 class AppSpacings {
