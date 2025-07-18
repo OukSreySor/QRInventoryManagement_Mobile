@@ -6,11 +6,25 @@ import '../services/auth_service.dart';
 import '../dto/user_dto.dart';
 import '../models/user.dart';
 import '../storage/token_storage.dart';
+import '../storage/user_storage.dart';
 
 class AuthController extends GetxController {
   final AuthService _authService = AuthService();
   var user = Rxn<User>();   // State
   var isLoggedIn = false.obs;  // Login status
+
+  @override
+  void onInit() {
+    super.onInit();
+
+    final savedToken = TokenStorage.getToken();
+    final savedUserJson = UserStorage.getUser();
+
+    if (savedToken != null && savedUserJson != null) {
+      user.value = UserDTO.fromJson(savedUserJson);
+      isLoggedIn.value = true;
+    }
+  }
 
   // Return true if successful, throw on error
   Future<bool> register(RegisterRequestDTO request) async {
@@ -34,13 +48,15 @@ class AuthController extends GetxController {
       }
 
       await TokenStorage.saveToken(accessToken);
-
+      
       final profileResponse = await _authService.getProfile();
       final userData = profileResponse['data'] as Map<String, dynamic>?;
 
       if (userData == null) {
         throw Exception('Failed to get user profile');
       }
+
+      await UserStorage.saveUser(userData);
 
       user.value = UserDTO.fromJson(userData);
       isLoggedIn.value = true;
@@ -60,6 +76,7 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     await TokenStorage.clearToken();
+    await UserStorage.clearUser();
     user.value = null;
     isLoggedIn.value = false;
     Get.offAllNamed('/auth');

@@ -28,38 +28,39 @@ class _AuthTabSelectorState extends State<AuthTabSelector> {
     );
   }
 
- Widget _buildTabButton(int index, String label) {
-    bool isSelected = _selectedIndex == index;
-    return Expanded( 
-      child: Material( 
-        color: Colors.transparent, 
-        child: InkWell( 
-          onTap: () {
-            setState(() {
-              _selectedIndex = index; 
-            });
-            widget.onTabChanged(index); 
-          },
-          splashColor: Colors.transparent, 
-          highlightColor: Colors.transparent, 
-          borderRadius: BorderRadius.circular(10.0), 
-          child: AnimatedContainer( // Provides smooth transition for color/shape
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
-            alignment: Alignment.center, 
-            decoration: BoxDecoration(
-              color: isSelected ? AppColors.tabSelectedBackground : AppColors.tabUnselectedBackground, 
-              borderRadius: BorderRadius.circular(10.0), 
-            ),
-            child: Text(
-              label,
-              style: AppTextStyles.tabSelected.copyWith( 
-                color: isSelected ? AppColors.primaryBlue : AppColors.textDark,
-              ),
-            ),
+  Widget _buildTabButton(int index, String label) {
+    final isSelected = _selectedIndex == index;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _selectedIndex = index;
+          });
+          widget.onTabChanged(index);
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 12.0),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected
+                ? AppColors.tabSelectedBackground
+                : AppColors.tabBackground,
+            borderRadius: BorderRadius.circular(6.0),
+            border: isSelected
+                ? Border.all(color: AppColors.borderContainer, width: 1.0)
+                : null,
+          ),
+          child: Text(
+            label,
+            style: isSelected
+                ? AppTextStyles.tabSelected.copyWith(color: AppColors.textBlack)
+                : AppTextStyles.tabUnselected,
           ),
         ),
       ),
     );
   }
+
 }

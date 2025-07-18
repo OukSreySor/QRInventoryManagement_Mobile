@@ -45,7 +45,7 @@ class _CompanyTabSelectorState extends State<CompanyTabSelector> {
           alignment: Alignment.center, 
           decoration: BoxDecoration(
             color: isSelected ? AppColors.buttonDark : Colors.transparent, 
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(6.0),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center, 
@@ -58,7 +58,7 @@ class _CompanyTabSelectorState extends State<CompanyTabSelector> {
               const SizedBox(width: 8.0), 
               Text(
                 label,
-                style: isSelected ? AppTextStyles.buttonText : AppTextStyles.secondaryButtonText, 
+                style: isSelected ? AppTextStyles.tabSelected.copyWith(color: AppColors.textWhite) : AppTextStyles.tabUnselected, 
               ),
             ],
           ),

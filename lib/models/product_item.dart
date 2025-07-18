@@ -33,37 +33,4 @@ class ProductItem {
     this.stockOuts,
   });
 
-  // factory ProductItem.fromJson(Map<String, dynamic> json) => ProductItem(
-  //       id: json['id'],
-  //       qrCode: json['qr_Code'],
-  //       serialNumber: json['serial_Number'],
-  //       status: productItemStatusFromString(json['status']),
-  //       manufacturingDate: DateTime.parse(json['manufacturing_Date']),
-  //       expiryDate: DateTime.parse(json['expiry_Date']),
-  //       productId: json['productId'],
-  //       product: Product.fromJson(json['product']),
-  //       userId: json['userId'],
-  //       user: User.fromJson(json['user']),
-  //       stockIns: json['stockIns'] != null
-  //           ? List<StockIn>.from(json['stockIns'].map((x) => StockIn.fromJson(x)))
-  //           : null,
-  //       stockOuts: json['stockOuts'] != null
-  //           ? List<StockOut>.from(json['stockOuts'].map((x) => StockOut.fromJson(x)))
-  //           : null,
-  //     );
-
-  // Map<String, dynamic> toJson() => {
-  //       'id': id,
-  //       'qr_Code': qrCode,
-  //       'serial_Number': serialNumber,
-  //       'status': status.name,
-  //       'manufacturing_Date': manufacturingDate.toIso8601String(),
-  //       'expiry_Date': expiryDate.toIso8601String(),
-  //       'productId': productId,
-  //       'product': product.toJson(),
-  //       'userId': userId,
-  //       'user': user.toJson(),
-  //       'stockIns': stockIns?.map((x) => x.toJson()).toList(),
-  //       'stockOuts': stockOuts?.map((x) => x.toJson()).toList(),
-  //     };
 }

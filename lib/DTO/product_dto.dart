@@ -1,7 +1,6 @@
 import 'package:qr_inventory_management/DTO/category_dto.dart';
 import 'package:qr_inventory_management/DTO/product_item_dto.dart';
 import 'package:qr_inventory_management/DTO/user_dto.dart';
-
 import '../models/product.dart';
 import '../models/enums/product_status.dart';
 
@@ -12,8 +11,8 @@ class ProductDTO {
       name: json['name'],
       description: json['description'],
       image: json['image'],
-      unitPrice: (json['unitPrice'] as num).toDouble(),
-      sellingPrice: (json['sellingPrice'] as num).toDouble(),
+      unitPrice: (json['unit_Price']),
+      sellingPrice: (json['selling_Price']),
       status: ProductStatus.values.firstWhere(
         (e) => e.toString().split('.').last == json['status'],
       ),
@@ -21,9 +20,9 @@ class ProductDTO {
       category: CategoryDTO.fromJson(json['category']),
       userId: json['userId'],
       user: UserDTO.fromJson(json['user']),
-      productItems: (json['productItems'] as List)
-          .map((item) => ProductItemDTO.fromJson(item))
-          .toList(),
+      productItems: (json['productItems'] as List<dynamic>?)
+              ?.map((item) => ProductItemDTO.fromJson(item))
+              .toList() ?? [],
     );
   }
 
