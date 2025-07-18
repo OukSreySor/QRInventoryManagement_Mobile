@@ -7,7 +7,6 @@ class Product {
   int id;
   String name;
   String description;
-  String? image;
   double unitPrice;
   double sellingPrice;
   ProductStatus status;
@@ -21,7 +20,6 @@ class Product {
     required this.id,
     required this.name,
     required this.description,
-    this.image,
     required this.unitPrice,
     required this.sellingPrice,
     required this.status,

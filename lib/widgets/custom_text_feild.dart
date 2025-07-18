@@ -11,6 +11,7 @@ class CustomTextField extends StatelessWidget {
   final bool readOnly;
   final VoidCallback? onTap;
   final Widget? suffixIcon;
+  final double? hintFontSize;
 
   const CustomTextField({
     super.key,
@@ -22,8 +23,8 @@ class CustomTextField extends StatelessWidget {
     this.validator,
     this.readOnly = false,
     this.onTap,
-    this.suffixIcon
-
+    this.suffixIcon,
+    this.hintFontSize
   });
 
   @override
@@ -44,7 +45,7 @@ class CustomTextField extends StatelessWidget {
           style: TextStyle(color: AppColors.textBlack),  
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(fontSize: 16.0, color: AppColors.textLight), 
+            hintStyle: TextStyle(fontSize: 16.0, color: AppColors.textLight).copyWith(fontSize: hintFontSize), 
             suffixIcon: suffixIcon,  
             filled: true,
             fillColor: AppColors.cardBackground,  

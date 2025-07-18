@@ -5,7 +5,7 @@ class ActionIconButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color backgroundColor;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double? height;
   final double? width;
 
@@ -14,7 +14,7 @@ class ActionIconButton extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.backgroundColor,
-    required this.onPressed,
+    this.onPressed,
     this.height,
     this.width
   });

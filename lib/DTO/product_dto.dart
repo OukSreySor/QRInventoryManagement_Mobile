@@ -10,7 +10,6 @@ class ProductDTO {
       id: json['id'],
       name: json['name'],
       description: json['description'],
-      image: json['image'],
       unitPrice: (json['unit_Price']),
       sellingPrice: (json['selling_Price']),
       status: ProductStatus.values.firstWhere(
@@ -31,7 +30,6 @@ class ProductDTO {
       'id': product.id,
       'name': product.name,
       'description': product.description,
-      'image': product.image,
       'unitPrice': product.unitPrice,
       'sellingPrice': product.sellingPrice,
       'status': product.status.toString().split('.').last,

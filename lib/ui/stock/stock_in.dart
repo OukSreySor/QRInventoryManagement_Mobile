@@ -215,6 +215,7 @@ class _StockInSectionState extends State<StockInSection> {
             CustomTextField(
               label: 'Serial Number',
               hintText: 'Input the Serial Number',
+              hintFontSize: 15.0,
               controller: _serialNumberController,
             ),
             const SizedBox(height: 20.0),

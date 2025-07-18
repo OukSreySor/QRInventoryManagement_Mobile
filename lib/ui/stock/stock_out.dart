@@ -1,6 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:qr_inventory_management/DTO/qr_stock_out_dto.dart';
+import 'package:qr_inventory_management/utils/snackbar_helper.dart';
 import '../../../theme/theme.dart';
+import '../../services/dio_client.dart';
 import '../../widgets/icon_button.dart';
 
 class StockOutSection extends StatefulWidget {
@@ -14,11 +18,67 @@ class _StockOutSectionState extends State<StockOutSection> {
   final TextEditingController _qrCodeController = TextEditingController();
 
   bool _itemFound = false;
+  bool _isLoading = false;
 
-  void _handleScanQrCode() {
+  // Call backend to scan and stock out product
+  Future<void> _handleScanQrCode() async {
+    final qrCode = _qrCodeController.text.trim();
+    if (qrCode.isEmpty) {
+      SnackbarHelper.error('Please enter or scan a QR code.');
+      return;
+    }
+    final validFormat = RegExp(r'^PIID\|\d+\|SN\|.+\|PID\|\d+$').hasMatch(qrCode);
+    if (!validFormat) {
+      SnackbarHelper.error('Invalid QR code format.');
+      return;
+    }
+
     setState(() {
-      _itemFound = true; 
+      _isLoading = true;
     });
+
+    try {
+      final dto = QrStockOutDto(
+        qrCode: qrCode,
+        soldDate: DateTime.now().toUtc()
+      );
+
+      final response = await DioClient.dio.post(
+        '/StockOut/scan-out',
+        data: dto.toJson(),
+      );
+    
+      final data = response.data;
+      if (data['success'] == true) {
+        setState(() {
+          _itemFound = true;  
+          _qrCodeController.clear(); 
+        });
+        SnackbarHelper.success(data['message'] ?? 'Item stocked out successfully!');
+      } else {
+        setState(() {
+          _itemFound = false;
+        });
+        SnackbarHelper.error(data['message'] ?? 'Failed to stock out the item.');
+      }
+    } catch (e) {
+
+      String errorMsg = 'Failed to stock out item.';
+      if (e is DioException) {
+        if (e.response != null && e.response?.data != null) {
+          errorMsg = e.response?.data['message'] ?? errorMsg;
+        } else {
+          errorMsg = e.message ?? errorMsg;
+        }
+      } else {
+        errorMsg = e.toString();
+      }
+      SnackbarHelper.error(errorMsg);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -79,9 +139,10 @@ class _StockOutSectionState extends State<StockOutSection> {
                     const SizedBox(height: 8.0),
                     TextField(
                       controller: _qrCodeController,
+                      enabled: !_isLoading,
                       decoration: InputDecoration(
-                        hintText: 'e.g. SF - 1723847304 - 2mnvh',
-                        hintStyle: TextStyle(color: AppColors.textLight), 
+                        hintText: 'e.g. PIID|30|SN|W-CHOCO-2|PID|15',
+                        hintStyle: TextStyle(color: AppColors.textLight, fontSize: 15.0), 
                         filled: true,
                         fillColor: AppColors.cardBackground, 
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
@@ -98,13 +159,14 @@ class _StockOutSectionState extends State<StockOutSection> {
                           borderSide: BorderSide(color: AppColors.orangeIcon, width: 2.0), 
                         ),
                       ),
+                      onSubmitted: (_) => _handleScanQrCode(),
                     ),
                     const SizedBox(height: 16.0),
                     ActionIconButton(
-                      label: 'Scan QR Code',
-                      icon: LucideIcons.scanLine,
+                      label: _isLoading ? 'Processing...' : 'Scan QR Code',
+                      icon: _isLoading ? LucideIcons.loader : LucideIcons.scanLine,
                       backgroundColor: AppColors.orangeIcon,
-                      onPressed: _handleScanQrCode,
+                      onPressed: _isLoading ? null : () => _handleScanQrCode(),
                       height: 48.0, 
                       width: double.infinity,
                     ),
@@ -113,7 +175,6 @@ class _StockOutSectionState extends State<StockOutSection> {
               ),
               const SizedBox(height: 28.0),
               if (_itemFound)
-                //ItemFoundCard(),
                 Container(
                   padding: const EdgeInsets.all(20.0),
                   decoration: BoxDecoration(
@@ -129,65 +190,26 @@ class _StockOutSectionState extends State<StockOutSection> {
                           Icon(LucideIcons.packageCheck,
                               color: AppColors.greenIcon, size: 20.0),
                           const SizedBox(width: 8.0),
-                          Text('Item Found',
-                              style: AppTextStyles.authSectionTitle),
+                          Expanded(
+                            child: Text(
+                              'Item stocked out successfully!',
+                              style: AppTextStyles.authSectionDescription
+                            ),
+                          ),
+                           IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              setState(() {
+                                _itemFound = false;
+                              });
+                            },
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 16.0),
-
-                      // 🧾 Item Detail Box
-                      Container(
-                        padding: const EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                          border: Border.all(color: const Color(0xFFB1E3C1), width: 2.0),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('ItemName',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 8.0),
-
-                            // 1st Row
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
-                                Text('Category: \nelectronics'),
-                                Text('Available Stock: \n1 Unit'),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-
-                            // 2nd Row
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
-                                Text('Unit Cost: \n\$150.00'),
-                                Text('Selling Price: \n\$160.00'),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-
-                            const Text('Serial Number: \nSF1723847304'),
-                            const Text('QR Code: \nSF - 1723847304 - 2mnvh'),
-                          ],
-                        ),     
-                      ),
-                      const SizedBox(height: 12.0),
-                      ActionIconButton(
-                        label: 'Remove 1 Unit',
-                        icon: LucideIcons.checkCircle,
-                        backgroundColor: AppColors.pinkRedIcon,
-                        onPressed: _handleScanQrCode,
-                        height: 48.0, 
-                        width: double.infinity,
-                      ),
-                    ],
+                    ]
                   ),
                 ),
-              const SizedBox(height: 28.0),
+              const SizedBox(height: 16.0),
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
@@ -214,10 +236,9 @@ class _StockOutSectionState extends State<StockOutSection> {
                           ),
                           SizedBox(height: 8.0),
                           Text(
-                            '1. Scan or manually enter the QR code\n'
-                            '2. Verify the item details and available stock\n'
-                            '3. Enter quantity to remove and optional notes\n'
-                            '4. Click “Remove” to confirm the transaction',
+                            '1. Scan the QR code\n'
+                            '2. Manually enter the QR code\n'
+                            '3. Click “Scan QR Code” to confirm the transaction',
                             style: TextStyle(fontSize: 14.0, color: Color(0xFF133782)),
                           ),
                         ],
@@ -230,132 +251,6 @@ class _StockOutSectionState extends State<StockOutSection> {
           ),
         ),
       ],
-    );
-  }
-}
-
-
-class ItemFoundCard extends StatelessWidget {
-  const ItemFoundCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE6F5EC), 
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: const Color(0xFFB1E3C1)), 
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'ItemName',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Info Rows
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text.rich(
-                TextSpan(
-                  text: 'Category: ',
-                  style: TextStyle(fontSize: 16),
-                  children: [
-                    TextSpan(
-                      text: 'electronics',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Text.rich(
-                TextSpan(
-                  text: 'Available Stock: ',
-                  style: TextStyle(fontSize: 16),
-                  children: [
-                    TextSpan(
-                      text: '1 Units',
-                      style: TextStyle(
-                        color: AppColors.darkBlue, 
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text.rich(
-                TextSpan(
-                  text: 'Unit Cost: ',
-                  style: TextStyle(fontSize: 16),
-                  children: [
-                    TextSpan(
-                      text: '\$150.00',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Text.rich(
-                TextSpan(
-                  text: 'Selling Price: ',
-                  style: TextStyle(fontSize: 16),
-                  children: [
-                    TextSpan(
-                      text: '\$160.00',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          const Text.rich(
-            TextSpan(
-              text: 'Serial Number: ',
-              style: TextStyle(fontSize: 16),
-              children: [
-                TextSpan(
-                  text: 'SF1723847304',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          const Text.rich(
-            TextSpan(
-              text: 'QR Code: ',
-              style: TextStyle(fontSize: 16),
-              children: [
-                TextSpan(
-                  text: 'SF - 1723847304 - 2mnvh',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
