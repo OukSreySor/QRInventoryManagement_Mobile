@@ -11,7 +11,7 @@ class RecentActivitySection extends StatelessWidget {
       padding: const EdgeInsets.all(18.0),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,  
-        borderRadius: BorderRadius.circular(16.0),  
+        borderRadius: BorderRadius.circular(12.0),  
         border: Border.all(color: AppColors.borderContainer, width: 1)
       ),
       child: Column(
@@ -22,12 +22,12 @@ class RecentActivitySection extends StatelessWidget {
               Icon(
                 LucideIcons.history,  
                 size: 24.0,
-                color: AppColors.textDark,
+                color: AppColors.textBlack,
               ),
-              const SizedBox(width: 10.0),  
+              const SizedBox(width: 8.0),  
               Text(
                 'Recent Activity',
-                style: AppTextStyles.sectionTitle,  
+                style: AppTextStyles.sectionTitle.copyWith(color: AppColors.textBlack),  
               ),
             ],
           ),

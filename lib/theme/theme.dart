@@ -12,8 +12,8 @@ class AppColors {
   static const Color textWhite = Colors.white; 
   static const Color textBlack = Colors.black; 
 
-  static const Color bannerGradientStart = Color(0xFF6B8BFB);
-  static const Color bannerGradientEnd = Color(0xFF8A6CFB);
+  static const Color bannerGradientStart = Color(0xFF3D80F6);
+  static const Color bannerGradientEnd = Color(0xFF9135EA);
 
   static const Color purpleIcon = Color(0xFF6A1B9A);
   static const Color greenIcon = Color(0xFF16A34A);
@@ -79,13 +79,13 @@ class AppTextStyles {
   );
 
   static TextStyle bannerHeadline = GoogleFonts.montserrat(
-    fontSize: 22,
-    fontWeight: FontWeight.w700,
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
     color: AppColors.textWhite,
   );
 
   static TextStyle bannerDescription = GoogleFonts.montserrat(
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: FontWeight.w500,
     color: AppColors.textWhite,
   );

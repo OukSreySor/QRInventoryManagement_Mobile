@@ -12,6 +12,7 @@ class CustomTextField extends StatelessWidget {
   final VoidCallback? onTap;
   final Widget? suffixIcon;
   final double? hintFontSize;
+  final int? maxLines;
 
   const CustomTextField({
     super.key,
@@ -24,7 +25,8 @@ class CustomTextField extends StatelessWidget {
     this.readOnly = false,
     this.onTap,
     this.suffixIcon,
-    this.hintFontSize
+    this.hintFontSize,
+    this.maxLines = 1
   });
 
   @override
@@ -42,6 +44,7 @@ class CustomTextField extends StatelessWidget {
           obscureText: obscureText,
           keyboardType: keyboardType,
           validator: validator,
+          maxLines: maxLines,
           style: TextStyle(color: AppColors.textBlack),  
           decoration: InputDecoration(
             hintText: hintText,

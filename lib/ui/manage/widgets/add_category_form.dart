@@ -3,15 +3,46 @@ import '../../../theme/theme.dart';
 import '../../../widgets/custom_text_feild.dart';
 import '../../../widgets/primary_button.dart';
 
-class AddCategoryForm extends StatelessWidget {
+class AddCategoryForm extends StatefulWidget {
   final VoidCallback onCancel;
+  final bool isEdit;
+  final String? initialName;
+  final String? initialDescription;
+  final void Function(String name, String description) onSubmit;
 
-  const AddCategoryForm({super.key, required this.onCancel});
+  const AddCategoryForm({
+    super.key,
+    required this.onCancel,
+    required this.isEdit,
+    this.initialName,
+    this.initialDescription,
+    required this.onSubmit,
+  });
+
+  @override
+  State<AddCategoryForm> createState() => _AddCategoryFormState();
+}
+
+class _AddCategoryFormState extends State<AddCategoryForm> {
+
+  late TextEditingController categoryNameController;
+  late TextEditingController descriptionController;
+
+  @override
+  void initState() {
+    super.initState();
+    categoryNameController = TextEditingController(text: widget.initialName ?? '');
+    descriptionController = TextEditingController(text: widget.initialDescription ?? '');
+  }
+  @override
+  void dispose() {
+    categoryNameController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController categoryNameController = TextEditingController();
-    final TextEditingController descriptionController = TextEditingController();
 
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -30,19 +61,23 @@ class AddCategoryForm extends StatelessWidget {
           ),
           const SizedBox(height: 16.0),
           CustomTextField(
-            label: 'Description (Optional)',
+            label: 'Description',
             hintText: 'Brief description of this category...',
             controller: descriptionController,
+            maxLines: 3
           ),
           const SizedBox(height: 24.0),
           Row(
             children: [
               Expanded(
                 child: PrimaryButton(
-                  text: 'Create Category',
+                  text: widget.isEdit ? 'Update Category' : 'Create Category',
                   onPressed: () {
-                    // Handle create logic
-                    onCancel();
+                    print('Submitted values: name=${categoryNameController.text}, description=${descriptionController.text}');
+                     widget.onSubmit(
+                      categoryNameController.text.trim(),
+                      descriptionController.text.trim(),
+                    );
                   },
                 ),
               ),
@@ -55,7 +90,7 @@ class AddCategoryForm extends StatelessWidget {
                   ),
                   child: PrimaryButton(
                     text: 'Cancel',
-                    onPressed: onCancel,
+                    onPressed: widget.onCancel,
                     backgroundColor: AppColors.textWhite,
                     textColor: AppColors.textBlack,
                   ),

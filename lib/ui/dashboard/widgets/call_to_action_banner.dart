@@ -8,9 +8,9 @@ class CallToActionBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(18.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.0), 
+        borderRadius: BorderRadius.circular(12.0), 
         gradient: const LinearGradient( 
           colors: [
             AppColors.bannerGradientStart,
@@ -25,18 +25,18 @@ class CallToActionBanner extends StatelessWidget {
         children: [
           const Icon(
             LucideIcons.trendingUp, 
-            size: 60.0,
+            size: 48.0,
             color: AppColors.textWhite, 
           ),
-          const SizedBox(height: 16.0), 
+          const SizedBox(height: 8.0), 
           Text(
             'Ready to manage your inventory?',
             textAlign: TextAlign.center, 
             style: AppTextStyles.bannerHeadline, 
           ),
-          const SizedBox(height: 8.0), 
+          //const SizedBox(height: 4.0), 
           Text(
-            'Use the tabs below to add or remove items',
+            'Use the tabs above to add or remove items',
             textAlign: TextAlign.center, 
             style: AppTextStyles.bannerDescription, 
           ),

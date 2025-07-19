@@ -29,29 +29,35 @@ class DashboardHeader extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 6.0),
-        Row(
-          mainAxisAlignment: 
-            onLogout != null ? MainAxisAlignment.spaceBetween : MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Text(
+        SizedBox(
+          width: double.infinity, 
+          child: Stack(
+            alignment: Alignment.center, 
+            children: [
+              // Subtitle (always centered within the Stack's full width)
+              Text(
                 subtitle,
                 style: AppTextStyles.subtitle,
-                textAlign: onLogout != null ? TextAlign.start : TextAlign.center,
+                textAlign: TextAlign.center, 
+                overflow: TextOverflow.ellipsis, 
+                maxLines: 1, 
               ),
-            ),
-            if (onLogout != null) 
-              IconButton(
-                onPressed: onLogout, 
-                icon: const Icon(
-                  LucideIcons.logOut,
-                  color: AppColors.primaryBlue,
-                  size: 24,
-                ),
-                tooltip: 'Logout',
-              )
-          ],
-        ),
+              if (onLogout != null) 
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    onPressed: onLogout, 
+                    icon: const Icon(
+                      LucideIcons.logOut,
+                      color: AppColors.primaryBlue,
+                      size: 24,
+                    ),
+                    tooltip: 'Logout',
+                  ),
+                )
+            ],
+          ),
+        )
       ],
     );
   }

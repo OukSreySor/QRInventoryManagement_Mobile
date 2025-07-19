@@ -1,6 +1,3 @@
-import 'package:qr_inventory_management/DTO/product_dto.dart';
-import 'package:qr_inventory_management/DTO/user_dto.dart';
-
 import '../models/category.dart';
 
 class CategoryDTO {
@@ -9,14 +6,10 @@ class CategoryDTO {
       id: json['id'],
       name: json['name'],
       description: json['description'],
-      products: json['products'] != null
-          ? (json['products'] as List)
-              .map((e) => ProductDTO.fromJson(e))
-              .toList()
-          : null,
       userId: json['userId'],
-      user: json['user'] != null ? UserDTO.fromJson(json['user']) : null, 
-      createdAt: json['createAt'],
+      createdAt: json['createAt'] != null
+          ? DateTime.parse(json['createAt'])
+          : null,
     );
   }
 
@@ -25,9 +18,6 @@ class CategoryDTO {
       'id': category.id,
       'name': category.name,
       'description': category.description,
-      'products': category.products?.map((e) => ProductDTO.toJson(e)).toList(),
-      'userId': category.userId,
-      'user': category.user != null ? UserDTO.toJson(category.user!) : null,
     };
   }
 }

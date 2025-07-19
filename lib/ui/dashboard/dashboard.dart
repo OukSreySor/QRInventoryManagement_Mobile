@@ -42,7 +42,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _subTabIndex = 0;
   int _subTab2Index = 0;
 
-  bool _showAddCategoryForm = false;
   bool _showAddProductForm = false;
 
   final List<InfoCardData> cards = [
@@ -167,7 +166,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           } else {
                             _subTab2Index = index;
                           }
-                          _showAddCategoryForm = false;
+                         
                           _showAddProductForm = false;
                         });
                       },
@@ -188,10 +187,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return Column(
         children: [
           InfoCardGrid(cards: cards),
-          SizedBox(height: 28.0),
-          RecentActivitySection(),
-          SizedBox(height: 28.0),
-          CallToActionBanner(),
+          SizedBox(height: 18.0),
+          SizedBox(width: double.infinity, child: RecentActivitySection()),
+          SizedBox(height: 18.0),
+          SizedBox(width: double.infinity, child: CallToActionBanner()),
         ],
       );
     }
@@ -237,11 +236,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (_mainTabIndex == 3) {
       switch (_subTab2Index) {
         case 0:
-          return Categories(
-            onAddPressed: () => setState(() => _showAddCategoryForm = true),
-            showAddForm: _showAddCategoryForm,
-            onCancelAddForm: () => setState(() => _showAddCategoryForm = false),
-          );
+          return Categories();
         case 1:
           return ProductsManagementScreen(
             onAddPressed: () => setState(() => _showAddProductForm = true),
