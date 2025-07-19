@@ -5,7 +5,7 @@ import 'package:qr_inventory_management/controllers/auth_controller.dart';
 import 'package:qr_inventory_management/ui/manage/categories.dart';
 import 'package:qr_inventory_management/ui/manage/products.dart';
 import 'package:qr_inventory_management/ui/reports/inventory_report.dart';
-import 'package:qr_inventory_management/ui/stock/product_list.dart';
+import 'package:qr_inventory_management/ui/stock/product_stock_summary.dart';
 import 'package:qr_inventory_management/ui/stock/stock_in.dart';
 import 'package:qr_inventory_management/ui/stock/stock_out.dart';
 import '../../models/user.dart';
@@ -14,7 +14,7 @@ import '../../widgets/dashboard_header.dart';
 import '../../widgets/navigation_tabs.dart';
 import '../manage/user_setting.dart';
 import '../stock/activity_log.dart';
-import '../stock/product_details.dart';
+import '../stock/product_item_details.dart';
 import '../../widgets/info_card_grid.dart';
 import 'widgets/recent_activity_section.dart';
 import 'widgets/call_to_action_banner.dart';
@@ -22,13 +22,11 @@ import 'widgets/call_to_action_banner.dart';
 class DashboardScreen extends StatefulWidget {
   final int? initialMainTabIndex;
   final int? initialSubTabIndex;
-  final ProductItemCard? productDetailsWidget;
 
   DashboardScreen({
     super.key,
     this.initialMainTabIndex,
     this.initialSubTabIndex,
-    this.productDetailsWidget,
   });
 
   @override
@@ -43,6 +41,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _subTab2Index = 0;
 
   bool _showAddProductForm = false;
+
+  int? _selectedProductId;
+
+  void _handleViewDetails(int productId) {
+    setState(() {
+      _selectedProductId = productId;
+      _subTabIndex = 4; 
+    });
+  }
+
 
   final List<InfoCardData> cards = [
     InfoCardData(
@@ -202,32 +210,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         case 1:
           return const StockOutSection();
         case 2:
-          return ProductList(
-            productName: 'iphone',
-            category: 'electronics',
-            stock: 4,
-            onViewDetails: () {
-              setState(() {
-                _subTabIndex = 4;
-              });
-            },
+          return ProductStockSummary(
+            onViewDetails: _handleViewDetails,
           );
         case 3:
           return ActivityLog(itemId: 52, serialNumber: 'SDFWO9', transactionType: 'Stock In', transactionDate: DateTime.now(), userName: 'Dara'); 
         case 4: 
-          return widget.productDetailsWidget ??
-            const ProductItemCard(
-              itemName: 'Iphone',
-              qrCode: 'SSEEO',
-              addedDate: '04/02/2022',
-              byUser: 'Sreysor',
-              mfgDate: '04/02/2022',
-              expDate: '04/02/2022',
-              price: 8.0,
-              cost: 9.0,
-            ); 
-      }
+          if (_selectedProductId != null) {
+            return ProductItemDetails(productId: _selectedProductId!);
+          } else {
+            return const Center(child: Text('No product selected.'));
+          }
     }
+}
 
     if (_mainTabIndex == 2) {
       return const Center(child: Text("QR Batch section"));
