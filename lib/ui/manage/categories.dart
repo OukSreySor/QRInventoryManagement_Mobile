@@ -6,83 +6,8 @@ import '../../services/category_service.dart';
 import '../../theme/theme.dart';
 import '../../utils/snackbar_helper.dart';
 import '../../widgets/icon_button.dart';
-import '../manage/widgets/add_category_form.dart';
+import 'widgets/add_edit_category_form.dart';
 
-class _CategoryCard extends StatelessWidget {
-  final String categoryName;
-  final String description;
-  final DateTime? creationDate;
-  final String createdBy;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
-
-  const _CategoryCard({
-    required this.categoryName,
-    required this.description,
-    this.creationDate,
-    required this.createdBy,
-    required this.onEdit,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: AppColors.cardBackground,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(width: 1.0, color: AppColors.textFieldBorder),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(categoryName, style: AppTextStyles.titleStyle),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(6.0),
-                        border: Border.all(color: AppColors.textFieldBorder),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(LucideIcons.edit, color: AppColors.buttonDark, size: 20),
-                        onPressed: onEdit,
-                        tooltip: 'Edit',
-                      ),
-                    ),
-                    const SizedBox(width: 8.0),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(color: AppColors.textFieldBorder),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(LucideIcons.trash2, color: AppColors.buttonDark, size: 20),
-                        onPressed: onDelete,
-                        tooltip: 'Delete',
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 12.0),
-            Text(description, style: AppTextStyles.labelStyle),
-            const SizedBox(height: 4.0),
-            Text('Created by $createdBy', style: AppTextStyles.textFieldLabel),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class Categories extends StatefulWidget {
   const Categories({super.key});
@@ -244,6 +169,82 @@ class _CategoriesState extends State<Categories> {
                   ),
                 )),
         ],
+      ),
+    );
+  }
+}
+
+class _CategoryCard extends StatelessWidget {
+  final String categoryName;
+  final String description;
+  final DateTime? creationDate;
+  final String createdBy;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const _CategoryCard({
+    required this.categoryName,
+    required this.description,
+    this.creationDate,
+    required this.createdBy,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      color: AppColors.cardBackground,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        side: BorderSide(width: 1.0, color: AppColors.textFieldBorder),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(categoryName, style: AppTextStyles.titleStyle),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6.0),
+                        border: Border.all(color: AppColors.textFieldBorder),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(LucideIcons.edit, color: AppColors.buttonDark, size: 20),
+                        onPressed: onEdit,
+                        tooltip: 'Edit',
+                      ),
+                    ),
+                    const SizedBox(width: 8.0),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.0),
+                        border: Border.all(color: AppColors.textFieldBorder),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(LucideIcons.trash2, color: AppColors.buttonDark, size: 20),
+                        onPressed: onDelete,
+                        tooltip: 'Delete',
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 12.0),
+            Text(description, style: AppTextStyles.labelStyle),
+            const SizedBox(height: 4.0),
+            Text('Created by $createdBy', style: AppTextStyles.textFieldLabel),
+          ],
+        ),
       ),
     );
   }

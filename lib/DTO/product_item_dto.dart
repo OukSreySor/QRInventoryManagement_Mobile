@@ -43,7 +43,7 @@ class ProductItemDTO {
       'manufacturingDate': item.manufacturingDate.toIso8601String(),
       'expiryDate': item.expiryDate.toIso8601String(),
       'productId': item.productId,
-      'product': ProductDTO.toJson(item.product),
+      //'product': ProductDTO.toJson(item.product),
       'userId': item.userId,
       'user': UserDTO.toJson(item.user),
       'stockIns': item.stockIns?.map((e) => StockInDTO.toJson(e)).toList(),

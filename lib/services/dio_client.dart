@@ -16,7 +16,7 @@ class DioClient {
         onRequest: (options, handler) async {
           final box = GetStorage();
           final token = box.read('access_token');
-
+          print('Token: $token');
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }

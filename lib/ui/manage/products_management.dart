@@ -1,23 +1,109 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:qr_inventory_management/utils/snackbar_helper.dart';
+import '../../models/product.dart';
+import '../../services/product_service.dart';
 import '../../theme/theme.dart';
 import '../../widgets/icon_button.dart';
-import '../manage/widgets/add_product_form.dart';
+import 'widgets/add_edit_product_form.dart';
 
-class ProductsManagementScreen extends StatelessWidget {
-  final VoidCallback? onAddPressed;
-  final bool showAddForm;
-  final VoidCallback? onCancelAddForm;
-
+class ProductsManagementScreen extends StatefulWidget {
   const ProductsManagementScreen({
     super.key,
-    this.onAddPressed,
-    this.showAddForm = false,
-    this.onCancelAddForm,
   });
 
   @override
+  State<ProductsManagementScreen> createState() => _ProductsManagementScreenState();
+}
+
+class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
+  final ProductService _productService = ProductService();
+  
+  List<Product> _products = [];
+  bool _isLoading = true;
+  bool _showForm = false;
+  bool _isEditMode = false;
+  Product? _editingProduct;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    setState(() => _isLoading = true);
+    try {
+       _products = await _productService.getAllProducts();
+    } catch (e) {
+      SnackbarHelper.error('Failed to fetch products');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _startAddProduct() {
+    setState(() {
+      _showForm = true;
+      _isEditMode = false;
+      _editingProduct = null;
+    });
+  }
+
+  void _startEditProduct(Product product) {
+    setState(() {
+      _showForm = true;
+      _isEditMode = true;
+      _editingProduct = product;
+    });
+  }
+
+  void _cancelForm() {
+    setState(() {
+      _showForm = false;
+      _isEditMode = false;
+      _editingProduct = null;
+    });
+  }
+
+  Future<void> _deleteProduct(int productId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: const Text('Are you sure you want to delete this product?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await _productService.deleteProduct(productId);
+      SnackbarHelper.success('Product deleted');
+      await _loadProducts();
+    } catch (e) {
+      SnackbarHelper.error('Failed to delete product');
+    }
+  }
+
+  Future<void> _handleFormSubmit() async {
+    // After form submission (create or update)
+    _cancelForm();
+    await _loadProducts();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+    if (_products.isEmpty) {
+      return Text('No products found.');
+    }
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -35,49 +121,52 @@ class ProductsManagementScreen extends StatelessWidget {
                 children: [
                   Icon(LucideIcons.packageCheck, size: 28, color: AppColors.buttonDark),
                   const SizedBox(width: 8.0),
-                  Text('Products (2)', style: AppTextStyles.titleStyle),
+                  Text('Products', style: AppTextStyles.titleStyle),
                 ],
               ),
               /// Show Add button only if form hidden
-              if (!showAddForm)
+              if (!_showForm)
                 ActionIconButton(
                   label: 'Add Product',
                   icon: LucideIcons.plus,
                   backgroundColor: AppColors.buttonDark,
-                  onPressed: onAddPressed ?? (){},
+                  onPressed: _startAddProduct,
                   height: 45.0,
                   width: 150.0,
                 ),
             ],
           ),
           const SizedBox(height: 20),
-
-          if (showAddForm) ...[
-            AddProductForm(onCancel: onCancelAddForm??(){}),
-            const SizedBox(height: 20.0),
+          if (_showForm) ...[
+                AddEditProductForm(
+                  isEdit: _isEditMode,
+                  initialProduct: _editingProduct,
+                  onSubmit: _handleFormSubmit,
+                  onCancel: _cancelForm,
+                ),
+                const SizedBox(height: 20.0),
           ],
-          _ProductCard(
-            productName: 'iPhone 15',
-            category: 'Electronics',
-            description: 'Latest Apple smartphone',
-            cost: 800.00,
-            price: 999.00,
-            creationDate: '7/15/2025',
-            createdBy: 'Admin User',
-            onEdit: () {},
-            onDelete: () {},
-          ),
-          const SizedBox(height: 16.0),
-          _ProductCard(
-            productName: 'T-Shirt Blue L',
-            category: 'Clothing',
-            description: 'Cotton blue t-shirt, size large',
-            cost: 15.00,
-            price: 25.00,
-            creationDate: '7/15/2025',
-            createdBy: 'Admin User',
-            onEdit: () {},
-            onDelete: () {},
+          SizedBox(
+            height: 400.0,
+            width: double.infinity,
+              child: ListView.separated(
+                itemCount: _products.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 16.0),
+                itemBuilder: (context, index) {
+                  final product = _products[index];
+                  print('Product: ${product.name}, Category: ${product.category.name}');
+                  return _ProductCard(
+                    productName: product.name,
+                    category: product.category.name,
+                    description: product.description,
+                    cost: product.unitPrice,
+                    price: product.sellingPrice,
+                    createdBy: 'Admin User', 
+                    onEdit: () => _startEditProduct(product),
+                    onDelete: () => _deleteProduct(product.id),
+                  );
+                },
+              ),
           ),
         ],
       ),
@@ -91,7 +180,6 @@ class _ProductCard extends StatelessWidget {
   final String description;
   final double cost;
   final double price;
-  final String creationDate;
   final String createdBy;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
@@ -102,7 +190,6 @@ class _ProductCard extends StatelessWidget {
     required this.description,
     required this.cost,
     required this.price,
-    required this.creationDate,
     required this.createdBy,
     required this.onEdit,
     required this.onDelete,
@@ -163,13 +250,13 @@ class _ProductCard extends StatelessWidget {
             const SizedBox(height: 8.0),
             Row(
               children: [
-                Text('\$ Cost: \$${cost.toStringAsFixed(2)}', style: AppTextStyles.subtitle),
+                Text('Buy: \$${cost.toStringAsFixed(2)}', style: AppTextStyles.subtitle.copyWith(color: AppColors.pinkRedIcon)),
                 const SizedBox(width: 16.0),
-                Text('\$ Price: \$${price.toStringAsFixed(2)}', style: AppTextStyles.subtitle),
+                Text('Sold: \$${price.toStringAsFixed(2)}', style: AppTextStyles.subtitle.copyWith(color: AppColors.greenIcon)),
               ],
             ),
             const SizedBox(height: 12.0),
-            Text('Created by $createdBy on $creationDate', style: AppTextStyles.textFieldLabel),
+            Text('Created by $createdBy', style: AppTextStyles.textFieldLabel),
             const SizedBox(height: 12.0),
             
           ],

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_inventory_management/controllers/auth_controller.dart';
 import 'package:qr_inventory_management/ui/manage/categories.dart';
-import 'package:qr_inventory_management/ui/manage/products.dart';
+import 'package:qr_inventory_management/ui/manage/products_management.dart';
 import 'package:qr_inventory_management/ui/reports/inventory_report.dart';
 import 'package:qr_inventory_management/ui/stock/product_stock_summary.dart';
 import 'package:qr_inventory_management/ui/stock/stock_in.dart';
@@ -39,8 +39,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _mainTabIndex = 0;
   int _subTabIndex = 0;
   int _subTab2Index = 0;
-
-  bool _showAddProductForm = false;
 
   int? _selectedProductId;
 
@@ -174,8 +172,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           } else {
                             _subTab2Index = index;
                           }
-                         
-                          _showAddProductForm = false;
                         });
                       },
                     ),
@@ -233,19 +229,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         case 0:
           return Categories();
         case 1:
-          return ProductsManagementScreen(
-            onAddPressed: () => setState(() => _showAddProductForm = true),
-            showAddForm: _showAddProductForm,
-            onCancelAddForm: () => setState(() => _showAddProductForm = false),
-          );
+          return ProductsManagementScreen();
         case 2:
           return const InviteCodesContainer();
         case 3:
           return InventoryReportsScreen();
       }
     }
-
-
     return const SizedBox.shrink(); // fallback
   }
 }
