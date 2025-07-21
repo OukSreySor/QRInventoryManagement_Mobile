@@ -43,12 +43,12 @@ class InfoCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: iconColor, size: 18.0), 
+              Icon(icon, color: iconColor, size: 20.0), 
               const SizedBox(width: 6.0), 
               Expanded( 
                 child: Text(
                   title,
-                  style: AppTextStyles.labelStyle.copyWith(fontSize: 12.0), 
+                  style: AppTextStyles.labelStyle.copyWith(fontSize: 12.0, fontWeight: FontWeight.bold), 
                   overflow: TextOverflow.ellipsis, 
                 ),
               ),
