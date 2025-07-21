@@ -82,16 +82,13 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
     if (confirmed != true) return;
 
     try {
-      await _productService.deleteProduct(productId);
+      await _productService.deleteProduct(productId, context);
       SnackbarHelper.success('Product deleted');
       await _loadProducts();
-    } catch (e) {
-      SnackbarHelper.error('Failed to delete product');
-    }
+    } catch (_) {}
   }
 
   Future<void> _handleFormSubmit() async {
-    // After form submission (create or update)
     _cancelForm();
     await _loadProducts();
   }
@@ -154,7 +151,6 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
                 separatorBuilder: (context, index) => const SizedBox(height: 16.0),
                 itemBuilder: (context, index) {
                   final product = _products[index];
-                  print('Product: ${product.name}, Category: ${product.category.name}');
                   return _ProductCard(
                     productName: product.name,
                     category: product.category.name,

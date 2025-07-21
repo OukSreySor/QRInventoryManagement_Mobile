@@ -18,21 +18,4 @@ class StockOut {
     required this.soldDate,
   });
 
-  // factory StockOut.fromJson(Map<String, dynamic> json) => StockOut(
-  //       id: json['id'],
-  //       productItemId: json['productItemId'],
-  //       productItem: ProductItem.fromJson(json['productItem']),
-  //       userId: json['userId'],
-  //       user: User.fromJson(json['user']),
-  //       soldDate: DateTime.parse(json['soldDate']),
-  //     );
-
-  // Map<String, dynamic> toJson() => {
-  //       'id': id,
-  //       'productItemId': productItemId,
-  //       'productItem': productItem.toJson(),
-  //       'userId': userId,
-  //       'user': user.toJson(),
-  //       'soldDate': soldDate.toIso8601String(),
-  //     };
 }

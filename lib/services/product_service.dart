@@ -1,9 +1,12 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:qr_inventory_management/DTO/create_product_dto.dart';
 import 'package:qr_inventory_management/models/product.dart';
 
 import '../DTO/product_dto.dart';
 import '../DTO/product_item_detail_dto.dart';
 import '../DTO/product_stock_summary_dto.dart';
+import '../utils/handle_dio_error.dart';
 import 'dio_client.dart';
 
 class ProductService {
@@ -57,7 +60,7 @@ class ProductService {
     }
   }
 
-  Future<void> createProduct(CreateProductDTO dto) async {
+  Future<void> createProduct(CreateProductDTO dto, BuildContext context) async {
     try {
       final response = await DioClient.dio.post('/Product', data: dto.toJson());
       print('Response: ${response.statusCode} - ${response.data}');
@@ -69,24 +72,45 @@ class ProductService {
         print('Backend returned error: ${response.data}');
         throw Exception('Failed to create product');
       }
-    } catch (e) {
-      print('Error creating product: $e');
+    } on DioException catch (e) {
+      handleDioError(e, context);
+      rethrow;
+    
+    }
+  }
+
+  Future<void> updateProduct(int productId, CreateProductDTO dto, BuildContext context) async {
+    try { 
+      final response = await DioClient.dio.put('/Product/$productId', data: dto.toJson());
+      if (response.statusCode != 200 || response.data['success'] != true) {
+        throw Exception('Failed to update product');
+      } 
+    } on DioException catch (e) {
+      handleDioError(e, context);
       rethrow;
     }
   }
 
-  Future<void> updateProduct(int productId, CreateProductDTO dto) async {
-    final response = await DioClient.dio.put('/Product/$productId', data: dto.toJson());
-    if (response.statusCode != 200 || response.data['success'] != true) {
-      throw Exception('Failed to update product');
+  Future<void> deleteProduct(int productId, BuildContext context) async {
+    try {
+      final response = await DioClient.dio.delete('/Product/$productId');
+      if (response.statusCode != 200 || response.data['success'] != true) {
+        handleDioError(
+        DioException(
+          requestOptions: response.requestOptions,
+          error: 'Failed to delete product',
+          response: response,
+          type: DioExceptionType.badResponse,
+        ),
+        context,
+      );
+      return;
+      }
+    } on DioException catch (e) {
+      handleDioError(e, context);
+      rethrow;
     }
-  }
-
-  Future<void> deleteProduct(int productId) async {
-    final response = await DioClient.dio.delete('/Product/$productId');
-    if (response.statusCode != 200 || response.data['success'] != true) {
-      throw Exception('Failed to delete product');
-    }
+    
   }
 
 }

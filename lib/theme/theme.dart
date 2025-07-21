@@ -127,7 +127,7 @@ class AppTextStyles {
   );
 
   static TextStyle titleStyle = GoogleFonts.montserrat(
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: FontWeight.w600,
     color: AppColors.textBlack,
   );
@@ -139,7 +139,7 @@ class AppTextStyles {
   );
 
   static TextStyle valueStyle = GoogleFonts.montserrat(
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: FontWeight.bold,
     color: AppColors.textBlack,
   );

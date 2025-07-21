@@ -105,11 +105,11 @@ class _AddEditProductFormState extends State<AddEditProductForm> {
 
   try {
     if (widget.isEdit && widget.initialProduct != null) {
-        await _productService.updateProduct(widget.initialProduct!.id, dto);
+        await _productService.updateProduct(widget.initialProduct!.id, dto, context);
         SnackbarHelper.success('Product updated successfully');
 
       } else {
-        await _productService.createProduct(dto);
+        await _productService.createProduct(dto, context);
         SnackbarHelper.success('Product created successfully');
       }
 
