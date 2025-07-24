@@ -28,7 +28,7 @@ class ActionIconButton extends StatelessWidget {
         icon: Icon(icon, color: AppColors.textWhite),
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),

@@ -38,14 +38,19 @@ class _NavigationTabsState extends State<NavigationTabs> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(widget.tabs.length, (index) {
           final tab = widget.tabs[index];
-          return Expanded(child: _buildTabItem(index, tab.icon, tab.label));
+          return Expanded(child: _buildTabItem(index, tab));
         }),
       ),
     );
   }
 
-  Widget _buildTabItem(int index, IconData icon, String label) {
+  Widget _buildTabItem(int index, TabItem tab) {
     final isSelected = _selectedIndex == index;
+
+     final TextStyle baseStyle = isSelected ? AppTextStyles.tabSelected : AppTextStyles.tabUnselected;
+     final TextStyle finalLabelStyle = baseStyle.merge(tab.labelStyle);
+
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -68,14 +73,15 @@ class _NavigationTabsState extends State<NavigationTabs> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                icon,
-                size: 16.0,
+                tab.icon,
+                size: 14.0,
                 color: isSelected ? AppColors.textBlack : AppColors.textDark,
               ),
               const SizedBox(width: 4.0),
               Text(
-                label,
-                style: isSelected ? AppTextStyles.tabSelected : AppTextStyles.tabUnselected,
+                tab.label,
+                style: finalLabelStyle,
+                
               ),
             ],
           ),
@@ -86,8 +92,9 @@ class _NavigationTabsState extends State<NavigationTabs> {
 }
 
 class TabItem {
-  final IconData icon;
+  final IconData? icon;
   final String label;
+  final TextStyle? labelStyle;
 
-  TabItem({required this.icon, required this.label});
+  TabItem({this.icon, required this.label, this.labelStyle, });
 }

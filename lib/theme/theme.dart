@@ -43,13 +43,13 @@ class AppTextStyles {
   );
 
   static TextStyle tabSelected = GoogleFonts.montserrat(
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: FontWeight.w600,
     color: AppColors.textBlack,
   );
 
   static TextStyle tabUnselected = GoogleFonts.montserrat(
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: FontWeight.w500,
     color: AppColors.textDark,
   );
@@ -109,7 +109,7 @@ class AppTextStyles {
   );
 
   static TextStyle buttonText = GoogleFonts.montserrat(
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: FontWeight.w600,
     color: AppColors.textWhite,
   );
@@ -139,7 +139,7 @@ class AppTextStyles {
   );
 
   static TextStyle valueStyle = GoogleFonts.montserrat(
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: FontWeight.bold,
     color: AppColors.textBlack,
   );

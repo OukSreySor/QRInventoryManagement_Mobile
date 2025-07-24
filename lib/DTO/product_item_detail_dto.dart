@@ -1,15 +1,15 @@
 class ProductItemDetailDTO {
   final int id;
   final String serialNumber;
-  final String manufacturingDate;
-  final String expiryDate;
+  final DateTime manufacturingDate;
+  final DateTime expiryDate;
   final double unitPrice;
   final double sellingPrice;
   final String qrCode;
   final String qrImageUrl;
   final String productName;
   final String userName;
-  final String addedDate;
+  final DateTime addedDate;
 
   ProductItemDetailDTO({
     required this.id,
@@ -29,15 +29,15 @@ class ProductItemDetailDTO {
     return ProductItemDetailDTO(
       id: json['id'],
       serialNumber: json['serial_Number'],
-      manufacturingDate: json['manufacturing_Date'],
-      expiryDate: json['expiry_Date'],
+      manufacturingDate: DateTime.parse(json['manufacturing_Date']),
+      expiryDate: DateTime.parse(json['expiry_Date']),
       unitPrice: (json['unit_Price'] as num).toDouble(),
       sellingPrice: (json['selling_Price'] as num).toDouble(),
       qrCode: json['qR_Code'],
       qrImageUrl: json['qrImageUrl'],
       productName: json['productName'],
       userName: json['userName'],
-      addedDate: json['addedDate'],
+      addedDate: DateTime.parse(json['addedDate']),
     );
   }
 }

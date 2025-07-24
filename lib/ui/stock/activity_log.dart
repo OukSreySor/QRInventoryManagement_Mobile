@@ -6,23 +6,9 @@ import '../../theme/theme.dart';
 import 'package:intl/intl.dart';
 
 class ActivityLog extends StatefulWidget {
-  final int itemId;
-  final String? itemName;
-  final String? qrCode;
-  final String serialNumber;
-  final String transactionType;
-  final DateTime transactionDate;
-  final String userName;
 
   const ActivityLog({
     super.key,
-    required this.itemId,
-    this.itemName,
-    this.qrCode,
-    required this.serialNumber,
-    required this.transactionType,
-    required this.transactionDate,
-    required this.userName,
   });
 
   @override
@@ -99,7 +85,6 @@ class _ActivityLogState extends State<ActivityLog> {
                 ),
               ),
             ),
-            const SizedBox(height: 6.0),
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),

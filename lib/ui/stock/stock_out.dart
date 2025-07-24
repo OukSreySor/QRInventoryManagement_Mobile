@@ -159,11 +159,12 @@ class _StockOutSectionState extends State<StockOutSection> {
                           borderSide: BorderSide(color: AppColors.orangeIcon, width: 2.0), 
                         ),
                       ),
+                      onChanged: (_) => setState(() {}),
                       onSubmitted: (_) => _handleScanQrCode(),
                     ),
                     const SizedBox(height: 16.0),
                     ActionIconButton(
-                      label: _isLoading ? 'Processing...' : 'Scan QR Code',
+                      label:  _isLoading ? 'Processing...' : 'Scan QR Code',
                       icon: _isLoading ? LucideIcons.loader : LucideIcons.scanLine,
                       backgroundColor: AppColors.orangeIcon,
                       onPressed: _isLoading ? null : () => _handleScanQrCode(),

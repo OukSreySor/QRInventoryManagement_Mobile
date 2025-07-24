@@ -2,16 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_inventory_management/controllers/auth_controller.dart';
+import 'package:qr_inventory_management/services/inventory_service.dart';
+import 'package:qr_inventory_management/ui/dashboard/widgets/low_stock_alert.dart';
+import 'package:qr_inventory_management/ui/dashboard/widgets/stock_trend_line_chart.dart';
+import 'package:qr_inventory_management/ui/dashboard/widgets/top_sale_product.dart';
 import 'package:qr_inventory_management/ui/manage/categories.dart';
 import 'package:qr_inventory_management/ui/manage/products_management.dart';
-import 'package:qr_inventory_management/ui/reports/inventory_report.dart';
+import 'package:qr_inventory_management/ui/manage/inventory_report.dart';
 import 'package:qr_inventory_management/ui/stock/product_stock_summary.dart';
 import 'package:qr_inventory_management/ui/stock/stock_in.dart';
 import 'package:qr_inventory_management/ui/stock/stock_out.dart';
+import '../../models/report.dart';
 import '../../models/user.dart';
+import '../../services/dio_client.dart';
 import '../../theme/theme.dart';
 import '../../widgets/dashboard_header.dart';
 import '../../widgets/navigation_tabs.dart';
+import '../../widgets/user_stats_card.dart';
 import '../manage/user_setting.dart';
 import '../stock/activity_log.dart';
 import '../stock/product_item_details.dart';
@@ -34,6 +41,8 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final _inventoryService = InventoryService();
+
   final AuthController authController = Get.find<AuthController>();
 
   int _mainTabIndex = 0;
@@ -42,40 +51,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   int? _selectedProductId;
 
+  Report? _dashboardSummary;
+  StockCount? _stockCount;
+
+  int stockInCount = 0;
+  int stockOutCount = 0;
+
   void _handleViewDetails(int productId) {
     setState(() {
       _selectedProductId = productId;
       _subTabIndex = 4; 
     });
   }
-
-
-  final List<InfoCardData> cards = [
-    InfoCardData(
-      icon: LucideIcons.package,
-      title: 'Total Units',
-      value: '0',
-      iconColor: AppColors.purpleIcon,
-    ),
-    InfoCardData(
-      icon: LucideIcons.dollarSign,
-      title: 'Total Value',
-      value: '\$0.00',
-      iconColor: AppColors.greenIcon,
-    ),
-    InfoCardData(
-      icon: LucideIcons.activity,
-      title: 'Today\'s Activity',
-      value: '0',
-      iconColor: AppColors.pinkRedIcon,
-    ),
-    InfoCardData(
-      icon: LucideIcons.alertTriangle,
-      title: 'Low Stock',
-      value: '0',
-      iconColor: AppColors.orangeIcon,
-    ),
-  ];
+   void _handleBackFromDetails() {
+    setState(() {
+      _subTabIndex = 2; // Go back to the 'Items' list tab
+      _selectedProductId = null; // Clear selected product ID
+    });
+  }
 
   @override
   void initState() {
@@ -87,7 +80,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } else if (_mainTabIndex == 3) {
       _subTab2Index = widget.initialSubTabIndex ?? 0;
     }
+
+    _fetchDashboardSummary();
+    _fetchDailyStockCount();
   }
+
+  Future<void> _fetchDashboardSummary() async {
+    try {
+      final summary = await _inventoryService.fetchInventoryReport(); 
+      setState(() {
+        _dashboardSummary = summary;
+      });
+    } catch (e) {
+      print("Error loading dashboard summary: $e");
+    }
+  }
+
+  Future<void> _fetchDailyStockCount() async {
+  try {
+    final response = await DioClient.dio.get('/Transaction/counts');
+    if (response.statusCode == 200 && response.data['success']) {
+      setState(() {
+        _stockCount = StockCount(
+          stockInCount: response.data['stockInCount'],
+          stockOutCount: response.data['stockOutCount'],
+        );
+        print("Fetched StockIn: ${response.data['StockInCount']}, StockOut: ${response.data['StockOutCount']}");
+
+      });
+    }
+  } catch (e) {
+    print("Error fetching daily counts: $e");
+  }
+}
+
+
   String _roleDisplayName(String role) {
     switch (role.toLowerCase()) {
       case 'admin':
@@ -108,11 +135,72 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return '$roleName Panel - $name';
   }
 
+  List<InfoCardData> _buildInfoCards() {
+    final summary = _dashboardSummary;
+
+    return [
+      InfoCardData(
+        icon: LucideIcons.package,
+        title: 'Total Items',
+        value: summary != null ? summary.totalInStock.toString() : '-',
+        iconColor: AppColors.purpleIcon,
+      ),
+      InfoCardData(
+        icon: LucideIcons.dollarSign,
+        title: 'Inventory Value',
+        value: summary != null ? '\$${summary.inventoryValue.toStringAsFixed(2)}' : '-',
+        iconColor: AppColors.greenIcon,
+      ),
+      InfoCardData(
+        icon: LucideIcons.trendingUp,
+        title: 'Stock In (Last 7 days)',
+        value: summary != null ? summary.recentStockInsLast7Days.toString() : '-',
+        iconColor: AppColors.greenIcon,
+      ),
+      InfoCardData(
+        icon: LucideIcons.trendingDown,
+        title: 'Stock Out (Last 7 days)',
+        value: summary != null ? summary.recentStockOutsLast7Days.toString() : '-',
+        iconColor: AppColors.pinkRedIcon,
+      ),
+    ];
+    
+  }
+
+  List<CardData> _buildUserCardData() {
+    final count = _stockCount;
+    return [
+      CardData(
+        icon: LucideIcons.trendingUp,
+        title: 'Stock In (Today)',
+        value: count != null ? count.stockInCount.toString() : '-',
+        iconColor: AppColors.greenIcon,
+      ),
+      CardData(
+        icon: LucideIcons.trendingDown,
+        title: 'Stock Out (Today)',
+        value: count != null ? count.stockOutCount.toString() : '-',
+        iconColor: AppColors.pinkRedIcon,
+      ),
+    ];
+  }
+  
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       final currentUser = authController.user.value;
+      final isAdmin = currentUser?.role.toLowerCase() == 'admin';
 
+      final mainTabs = [
+        TabItem(icon: LucideIcons.barChart3, label: 'Home'),
+        TabItem(icon: LucideIcons.package, label: 'Stock'),
+        TabItem(icon: LucideIcons.qrCode, label: 'QR'),
+      ];
+
+      if (isAdmin) {
+        mainTabs.add(TabItem(icon: LucideIcons.settings, label: 'Manage'));
+      }
       return Scaffold(
         backgroundColor: AppColors.lightBackground,
         body: SingleChildScrollView(
@@ -131,38 +219,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 28.0),
               NavigationTabs(
-                tabs: [
-                  TabItem(icon: LucideIcons.barChart3, label: 'Home'),
-                  TabItem(icon: LucideIcons.package, label: 'Stock'),
-                  TabItem(icon: LucideIcons.qrCode, label: 'QR Batch'),
-                  TabItem(icon: LucideIcons.settings, label: 'Manage'),
-                ],
-                initialIndex: _mainTabIndex,
+                tabs: mainTabs,
+                initialIndex: _mainTabIndex >= mainTabs.length ? 0 : _mainTabIndex,
                 onTabSelected: (index) {
                   setState(() {
                     _mainTabIndex = index;
                     _subTabIndex = 0;
                     _subTab2Index = 0; 
                   });
+                  if (index == 0) {
+                    _fetchDashboardSummary();
+                    _fetchDailyStockCount(); 
+                  }
                 },
               ),
-              const SizedBox(height: 20.0),
-              if (_mainTabIndex == 1 || _mainTabIndex == 3)
+              const SizedBox(height: 16.0),
+              if (_mainTabIndex == 1 || (_mainTabIndex == 3 && isAdmin))
                 Column(
                   children: [
                     NavigationTabs(
+                      key: ValueKey('subTabs_$_mainTabIndex'),
                       tabs: _mainTabIndex == 1
                         ? [
                             TabItem(icon: LucideIcons.plus, label: 'In'),
                             TabItem(icon: LucideIcons.minus, label: 'Out'),
-                            TabItem(icon: LucideIcons.list, label: 'List'),
+                            TabItem(icon: LucideIcons.box, label: 'Items'),
                             TabItem(icon: LucideIcons.activity, label: 'Activity'),
                           ]
                         : [
-                            TabItem(icon: LucideIcons.folder, label: 'Categories'),
-                            TabItem(icon: LucideIcons.package, label: 'Products'),
-                            TabItem(icon: LucideIcons.user, label: 'Users'),
-                            TabItem(icon: LucideIcons.receipt, label: 'Report'),
+                            TabItem(icon: LucideIcons.folder, label: 'Category', labelStyle: TextStyle(fontSize: 12.0)),
+                            TabItem(icon: LucideIcons.package, label: 'Product'),
+                            TabItem(icon: LucideIcons.user, label: 'User'),
+                            TabItem(icon: LucideIcons.fileText, label: 'Report'),
                           ],
                       initialIndex: _mainTabIndex == 1 ? _subTabIndex : _subTab2Index,
                       onTabSelected: (index) {
@@ -175,10 +263,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         });
                       },
                     ),
-                    const SizedBox(height: 28.0),
+                    const SizedBox(height: 16.0),
                   ],
                 ),
-              _buildMainContent(),
+              _buildMainContent(isAdmin),
             ],
           ),
         ),
@@ -186,15 +274,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  Widget _buildMainContent() {
+  Widget _buildMainContent(bool isAdmin) {
     if (_mainTabIndex == 0) {
       return Column(
         children: [
-          InfoCardGrid(cards: cards),
-          SizedBox(height: 18.0),
-          SizedBox(width: double.infinity, child: RecentActivitySection()),
-          SizedBox(height: 18.0),
+
+          if (isAdmin) ... [
+            InfoCardGrid(cards: _buildInfoCards()),
+            SizedBox(height: 8.0),
+            LowStockAlert(
+              lowStockProducts: _dashboardSummary?.lowStockProducts ?? [],
+            ),
+            SizedBox(height: 16.0),
+            TopSaleProduct(
+              hotProducts: _dashboardSummary?.hotProducts30Days ?? [],
+            ),
+            SizedBox(height: 16.0),
+            SizedBox(
+              width: double.infinity,
+              height: 300.0, 
+              child: StockTrendLineChart()
+            ),
+            
+          ] else ...[
+            UserStatsCard(cards: _buildUserCardData()),
+            SizedBox(height: 16.0),
+            SizedBox(width: double.infinity, child: RecentActivitySection()),
+            
+          ],
+          SizedBox(height: 16.0),
           SizedBox(width: double.infinity, child: CallToActionBanner()),
+          
         ],
       );
     }
@@ -210,13 +320,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onViewDetails: _handleViewDetails,
           );
         case 3:
-          return ActivityLog(itemId: 52, serialNumber: 'SDFWO9', transactionType: 'Stock In', transactionDate: DateTime.now(), userName: 'Dara'); 
+          return ActivityLog(); 
         case 4: 
           if (_selectedProductId != null) {
-            return ProductItemDetails(productId: _selectedProductId!);
+            return ProductItemDetails(
+              productId: _selectedProductId!,
+              onBack: _handleBackFromDetails,
+            );
           } else {
-            return const Center(child: Text('No product selected.'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('No product selected for details.'),
+                  ElevatedButton(
+                    onPressed: () => setState(() => _subTabIndex = 2),
+                    child: const Text('Go to Product Items'),
+                  ),
+                ],
+              ),
+            );
           }
+        default: 
+          return const Center(child: Text('Invalid Stock Sub-tab Selected'));
+      
     }
 }
 
@@ -225,17 +352,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     if (_mainTabIndex == 3) {
+      if (!isAdmin) {
+        return Center(child: Text('Access Denied: You do not have permission to view this section.'));
+      }
       switch (_subTab2Index) {
         case 0:
           return Categories();
         case 1:
           return ProductsManagementScreen();
         case 2:
-          return const InviteCodesContainer();
+          return InviteCodesContainer();
         case 3:
           return InventoryReportsScreen();
+        default: 
+          return const Center(child: Text('Invalid Manage Sub-tab Selected'));
+      
       }
     }
     return const SizedBox.shrink(); // fallback
   }
 }
+
+
+
+    
+ 

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../../theme/theme.dart';
+import '../theme/theme.dart';
 
-class InfoCardData {
+class CardData {
   final IconData icon;
   final String title;
   final String value;
   final Color iconColor;
 
-  const InfoCardData({
+  const CardData({
     required this.icon,
     required this.title,
     required this.value,
@@ -69,7 +69,7 @@ class InfoCard extends StatelessWidget {
 }
 
 class UserStatsCard extends StatelessWidget {
-  final List<InfoCardData> cards;
+  final List<CardData> cards;
 
   const UserStatsCard({super.key, required this.cards});
 

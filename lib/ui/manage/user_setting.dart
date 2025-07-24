@@ -8,7 +8,7 @@ import '../../models/invite_code.dart';
 import '../../models/user.dart';
 import '../../services/admin_service.dart';
 import '../../theme/theme.dart';
-import 'widgets/user_stats_card.dart';
+import '../../widgets/user_stats_card.dart';
 
 class InviteCodesContainer extends StatefulWidget {
   const InviteCodesContainer({super.key});
@@ -66,20 +66,20 @@ class _InviteCodesContainerState extends State<InviteCodesContainer> {
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    final List<InfoCardData> statsCards = [
-      InfoCardData(
+    final List<CardData> statsCards = [
+      CardData(
         icon: Icons.group,
         title: 'Total Users',
         value: users.length.toString(),
         iconColor: AppColors.primaryBlue,
       ),
-      InfoCardData(
+      CardData(
         icon: Icons.admin_panel_settings,
         title: 'Admins',
         value: users.where((u) => u.role == 'Admin').length.toString(),
         iconColor: AppColors.orangeIcon,
       ),
-      InfoCardData(
+      CardData(
         icon: Icons.check_circle,
         title: 'Active User',
         value:
@@ -117,70 +117,61 @@ class _InviteCodesContainerState extends State<InviteCodesContainer> {
                 style: AppTextStyles.authSectionDescription,
               ),
               const SizedBox(height: 16),
-              const Divider(color: AppColors.textFieldBorder, thickness: 1.0),
-              const SizedBox(height: 16),
               Text('New Invite Code', style: AppTextStyles.titleStyle),
               const SizedBox(height: 8),
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch, 
                 children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.textFieldBorder),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            newInviteCode ?? 'Click to generate',
-                            style: AppTextStyles.authSectionDescription,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.textFieldBorder),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          newInviteCode ?? 'Click to generate',
+                          style: AppTextStyles.authSectionDescription,
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            LucideIcons.copy,
+                            size: 16.0,
+                            color: AppColors.primaryBlue,
                           ),
-                          IconButton(
-                            icon: Icon(
-                              LucideIcons.copy,
-                              size: 16.0,
-                              color: AppColors.primaryBlue,
-                            ),
-                            onPressed: () {
-                              if (newInviteCode != null &&
-                                  newInviteCode!.isNotEmpty) {
-                                Clipboard.setData(
-                                  ClipboardData(text: newInviteCode!),
-                                );
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Invite code copied to clipboard!',
-                                    ),
-                                    duration: Duration(seconds: 2),
+                          onPressed: () {
+                            if (newInviteCode != null &&
+                                newInviteCode!.isNotEmpty) {
+                              Clipboard.setData(
+                                ClipboardData(text: newInviteCode!),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Invite code copied to clipboard!',
                                   ),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('No invite code to copy.'),
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                        ],
-                      ),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('No invite code to copy.'),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 8.0),
-                  SizedBox(
-                    width: 200.0,
-                    child: PrimaryButton(
-                      text: 'Generate New Code',
-                      onPressed: handleGenerateCode,
-                    ),
+                  const SizedBox(height: 16.0),
+                  PrimaryButton(
+                    text: 'Generate New Code',
+                    onPressed: handleGenerateCode,
                   ),
                 ],
               ),

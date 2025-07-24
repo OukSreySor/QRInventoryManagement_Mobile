@@ -62,35 +62,35 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18.0),
+      padding: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(16.0),
         border: Border.all(color: AppColors.borderContainer, width: 1.0),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              Icon(icon, color: iconColor, size: 20.0),
-              const SizedBox(width: 8.0),
-              Text(
-                title,
-                style: AppTextStyles.labelStyle
-              ),
-            ],
+          Icon(icon, color: iconColor, size: 16.0),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            )
           ),
-          const SizedBox(height: 8.0),
-          Padding(
-            padding: const EdgeInsets.only(left: 28.0),
-            child: Text(
-              value,
-              style: AppTextStyles.valueStyle
-            ),
+          const SizedBox(height: 4.0),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primaryBlue
+            )
           ),
         ],
       ),
     );
   }
 }
+

@@ -4,6 +4,7 @@ import 'package:qr_inventory_management/utils/snackbar_helper.dart';
 import '../../models/product.dart';
 import '../../services/product_service.dart';
 import '../../theme/theme.dart';
+import '../../utils/no_data_place_holder.dart';
 import '../../widgets/icon_button.dart';
 import 'widgets/add_edit_product_form.dart';
 
@@ -99,7 +100,11 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
       return Center(child: CircularProgressIndicator());
     }
     if (_products.isEmpty) {
-      return Text('No products found.');
+      return const NoDataPlaceholder(
+        title: 'No product in Inventory',
+        message: 'Start by adding some product using the “Manage” tab',
+        icon: LucideIcons.box, 
+      );
     }
     return Container(
       padding: const EdgeInsets.all(16.0),

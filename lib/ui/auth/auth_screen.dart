@@ -14,7 +14,8 @@ import '../../widgets/dashboard_header.dart';
 import '../../widgets/primary_button.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
+  final int initialTabIndex;
+  const AuthScreen({super.key, this.initialTabIndex = 0});  // Sign In 
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -34,6 +35,13 @@ class _AuthScreenState extends State<AuthScreen> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _inviteCodeController = TextEditingController();
   final TextEditingController _companyNameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _authTabIndex = widget.initialTabIndex;
+  }
+
 
   void _handleAuthTabChange(int index) {
     setState(() {
@@ -141,13 +149,16 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 80.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const DashboardHeader(subtitle: 'Smart Inventory Management'),
             const SizedBox(height: 36.0),
-            AuthTabSelector(onTabChanged: _handleAuthTabChange),
+            AuthTabSelector(
+              initialIndex: _authTabIndex, 
+              onTabChanged: _handleAuthTabChange
+            ),
             const SizedBox(height: 28.0),
             Container(
               padding: const EdgeInsets.all(24.0),
