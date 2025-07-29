@@ -31,14 +31,15 @@ class _NavigationTabsState extends State<NavigationTabs> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.tabBackground,
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(4.0),
       ),
       padding: const EdgeInsets.all(2.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        //mainAxisAlignment: MainAxisAlignment.spaceAround, 
+        mainAxisAlignment: MainAxisAlignment.center,
         children: List.generate(widget.tabs.length, (index) {
           final tab = widget.tabs[index];
-          return Expanded(child: _buildTabItem(index, tab));
+          return Flexible(child: _buildTabItem(index, tab));
         }),
       ),
     );

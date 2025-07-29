@@ -86,7 +86,6 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: AppColors.textFieldBorder),
                   ),
                   child: PrimaryButton(
                     text: 'Cancel',

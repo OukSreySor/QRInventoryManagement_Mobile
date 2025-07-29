@@ -22,7 +22,7 @@ class StockInDTO {
       'productItem': ProductItemDTO.toJson(stockIn.productItem),
       'userId': stockIn.userId,
       'user': UserDTO.toJson(stockIn.user),
-      'receivedDate': stockIn.receivedDate.toIso8601String(),
+      'receivedDate': stockIn.receivedDate,
     };
   }
 }

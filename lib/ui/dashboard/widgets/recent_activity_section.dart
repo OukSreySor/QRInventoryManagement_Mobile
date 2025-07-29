@@ -76,72 +76,62 @@ class _RecentActivitySectionState extends State<RecentActivitySection> {
                   style: AppTextStyles.sectionDescription,
                 );
               } else {
-   
-                return ListView.builder(
-                  shrinkWrap: true, 
-                  physics: const NeverScrollableScrollPhysics(), 
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    final activity = snapshot.data![index];
+                final List<RecentActivity> activities = snapshot.data!;
+
+                return Column( 
+                  crossAxisAlignment: CrossAxisAlignment.start, 
+                  children: activities.map((activity) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0), 
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
-                            width: 90, 
+                            width: 90,
                             child: Text(
                               activity.relativeTransactionTime,
-                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 10, color: AppColors.textLight),
-                              textAlign: TextAlign.right, 
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 10,
+                                color: AppColors.textLight,
+                              ),
+                              textAlign: TextAlign.right,
                             ),
                           ),
-                          const SizedBox(width: 4.0), 
+                          const SizedBox(width: 4.0),
                           Container(
                             width: 2,
-                            height: 12, 
+                            height: 12,
                             color: AppColors.borderContainer,
                           ),
-                          const SizedBox(width: 4.0), 
+                          const SizedBox(width: 4.0),
                           Expanded(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    RichText(
-                                      text: TextSpan(
-                                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 10, color: Colors.black),
-                                        children: [
-                                          TextSpan(text: activity.productName),
-                                          TextSpan(
-                                            text: ' (Serial: ${activity.serialNumber}) ',
-                                          ),
-                                          TextSpan(
-                                            text: activity.transactionType == 'StockIn' ? 'Stocked In' : 'Stocked Out',
-                                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 10).copyWith(
-                                              color: activity.transactionType == 'StockIn' ? Colors.green : Colors.red,
-                                            ),    
-                                          ),
-                                          
-                                        ],
-                                      ),
+                                Text.rich(
+                                  TextSpan(
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 10,
+                                      color: Colors.black,
                                     ),
-                                    Text(
-                                      ' By: ${activity.userName}',
-                                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 10, color: Colors.black),
-                                    ),
-                                  ],
+                                    children: [
+                                      TextSpan(text: activity.productName),
+                                      TextSpan(text: ' (Serial: ${activity.serialNumber}) '),
+                                      TextSpan(text: activity.transactionType),
+                                      TextSpan(text: ' ${activity.userName}'),
+                                    ],
+                                  ),
+                                  softWrap: true,
+                                  overflow: TextOverflow.visible,
                                 ),
-                                
                               ],
-                            ),
-                          ),
-                        ],
-                      ),
+                            ),)
+                        ]
+                      )
                     );
-                  },
+                  }).toList(), 
                 );
               }
             },

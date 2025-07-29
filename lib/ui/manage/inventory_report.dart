@@ -22,10 +22,10 @@ class _InventoryReportsScreenState extends State<InventoryReportsScreen> {
   Future<Report> _fetchReport() async {
     final queryParameters = <String, dynamic>{};
     if (_startDate != null) {
-      queryParameters['startDate'] = _startDate!.toIso8601String();
+      queryParameters['startDate'] = _startDate!;
     }
     if (_endDate != null) {
-      queryParameters['endDate'] = _endDate!.toIso8601String();
+      queryParameters['endDate'] = _endDate!;
     }
 
     final res = await DioClient.dio.get(
@@ -34,9 +34,10 @@ class _InventoryReportsScreenState extends State<InventoryReportsScreen> {
     );
 
     if (res.statusCode == 200 && res.data['success']) {
+      print('API Response Data: ${res.data}');
       return Report.fromJson(res.data);
     } else {
-      throw Exception('Failed to load report');
+      throw Exception('Failed to load report: ${res.data}');
     }
   }
 
@@ -87,7 +88,7 @@ class _InventoryReportsScreenState extends State<InventoryReportsScreen> {
       children: [
         // Date filter row
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -103,7 +104,7 @@ class _InventoryReportsScreenState extends State<InventoryReportsScreen> {
                   
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               ActionIconButton(
                 label: 'Apply', 
                 icon: LucideIcons.check, 
@@ -158,13 +159,14 @@ class _InventoryReportsScreenState extends State<InventoryReportsScreen> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 4.0),
                 _buildHeaderCard(),
                 InfoCardGrid(cards: cards),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 8.0),
                 _buildStockMovement(report),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 8.0),
                 _buildCategoryBreakdown(report),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 8.0),
                 _buildLast7DaysActivity(report),
               ],
             );
@@ -175,7 +177,7 @@ class _InventoryReportsScreenState extends State<InventoryReportsScreen> {
   }
 
   Widget _buildDatePickerField(String label, DateTime? date, VoidCallback onTap) {
-    final text = date == null ? 'Select $label' : '${date.year}-${date.month.toString().padLeft(2,'0')}-${date.day.toString().padLeft(2,'0')}';
+    final text = date == null ? label : '${date.day.toString().padLeft(2,'0')}-${date.month.toString().padLeft(2,'0')}-${date.year}';
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -203,7 +205,7 @@ class _InventoryReportsScreenState extends State<InventoryReportsScreen> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(10.0),
         side: BorderSide(color: AppColors.textFieldBorder, width: 1.0),
       ),
       color: Colors.white,

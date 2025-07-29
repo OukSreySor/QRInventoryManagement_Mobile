@@ -26,7 +26,7 @@ class ActivityLogEntry {
       qrCode: json['qrCode'] ?? '',
       serialNumber: json['serialNumber'] ?? '',
       transactionType: json['transactionType'],
-      transactionDate: DateTime.parse(json['transactionDate']),
+      transactionDate:DateTime.parse( json['transactionDate']),
       userName: json['userName'] ?? 'Unknown',
       transactionValue: (json['transactionValue'] as num).toDouble(),
     );

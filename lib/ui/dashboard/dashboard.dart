@@ -12,6 +12,7 @@ import 'package:qr_inventory_management/ui/manage/inventory_report.dart';
 import 'package:qr_inventory_management/ui/stock/product_stock_summary.dart';
 import 'package:qr_inventory_management/ui/stock/stock_in.dart';
 import 'package:qr_inventory_management/ui/stock/stock_out.dart';
+import 'package:qr_inventory_management/utils/no_data_place_holder.dart';
 import '../../models/report.dart';
 import '../../models/user.dart';
 import '../../services/dio_client.dart';
@@ -132,7 +133,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final roleName = _roleDisplayName(user.role);
     final name = user.username;
 
-    return '$roleName Panel - $name';
+    return '$roleName - $name';
   }
 
   List<InfoCardData> _buildInfoCards() {
@@ -199,7 +200,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ];
 
       if (isAdmin) {
-        mainTabs.add(TabItem(icon: LucideIcons.settings, label: 'Manage'));
+        mainTabs.add(TabItem(icon: LucideIcons.settings, label: 'Tools'));
       }
       return Scaffold(
         backgroundColor: AppColors.lightBackground,
@@ -247,8 +248,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             TabItem(icon: LucideIcons.activity, label: 'Activity'),
                           ]
                         : [
-                            TabItem(icon: LucideIcons.folder, label: 'Category', labelStyle: TextStyle(fontSize: 12.0)),
-                            TabItem(icon: LucideIcons.package, label: 'Product'),
+                            TabItem(icon: LucideIcons.folder, label: 'Groups', labelStyle: TextStyle(fontSize: 12.0)),
+                            TabItem(icon: LucideIcons.package, label: 'Goods'),
                             TabItem(icon: LucideIcons.user, label: 'User'),
                             TabItem(icon: LucideIcons.fileText, label: 'Report'),
                           ],
@@ -285,7 +286,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             LowStockAlert(
               lowStockProducts: _dashboardSummary?.lowStockProducts ?? [],
             ),
-            SizedBox(height: 16.0),
+            SizedBox(height: 8.0),
             TopSaleProduct(
               hotProducts: _dashboardSummary?.hotProducts30Days ?? [],
             ),
@@ -297,12 +298,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             
           ] else ...[
-            UserStatsCard(cards: _buildUserCardData()),
+            UserStatsCard(cards: _buildUserCardData(), cardWidth: 164),
             SizedBox(height: 16.0),
             SizedBox(width: double.infinity, child: RecentActivitySection()),
             
           ],
-          SizedBox(height: 16.0),
+          SizedBox(height: 8.0),
           SizedBox(width: double.infinity, child: CallToActionBanner()),
           
         ],
@@ -348,7 +349,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
     if (_mainTabIndex == 2) {
-      return const Center(child: Text("QR Batch section"));
+      return const Center(
+        child: NoDataPlaceholder(
+          icon: LucideIcons.qrCode,
+          title: 'This section not available yet.',
+          message: 'To add some product items to generate QR batch',
+        )
+      );
     }
 
     if (_mainTabIndex == 3) {

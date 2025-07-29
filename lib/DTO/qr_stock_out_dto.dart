@@ -7,7 +7,7 @@ class QrStockOutDto {
   Map<String, dynamic> toJson() {
     return {
       'QrCode': qrCode,
-      'SoldDate': soldDate.toIso8601String(),
+      'SoldDate': soldDate,
     };
   }
 }

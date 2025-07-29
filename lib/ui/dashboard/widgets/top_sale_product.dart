@@ -32,7 +32,7 @@ class TopSaleProduct extends StatelessWidget {
               ),
               const SizedBox(width: 8.0),  
               Text(
-                'Top 3 Best Selling (last 30 days)',
+                'Top 3 Best Selling',
                 style: AppTextStyles.sectionTitle.copyWith(fontSize: 16, color: AppColors.textBlack),  
               ),
             ],

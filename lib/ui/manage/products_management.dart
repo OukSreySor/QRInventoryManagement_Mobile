@@ -4,6 +4,7 @@ import 'package:qr_inventory_management/utils/snackbar_helper.dart';
 import '../../models/product.dart';
 import '../../services/product_service.dart';
 import '../../theme/theme.dart';
+import '../../utils/confirm_dialog.dart';
 import '../../utils/no_data_place_holder.dart';
 import '../../widgets/icon_button.dart';
 import 'widgets/add_edit_product_form.dart';
@@ -68,16 +69,13 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
   }
 
   Future<void> _deleteProduct(int productId) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Confirm Delete'),
-        content: const Text('Are you sure you want to delete this product?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
-        ],
-      ),
+      title: 'Confirm Delete', 
+      content: 'Are you sure you want to delete this product?',
+      confirmText: 'Yes',
+      cancelText: 'No',
+      confirmColor: AppColors.pinkRedIcon,
     );
 
     if (confirmed != true) return;
@@ -110,8 +108,8 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: AppColors.textFieldBorder, width: 1.0)
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(color: AppColors.textFieldBorder, width: 2.0)
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,7 +119,7 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
             children: [
               Row(
                 children: [
-                  Icon(LucideIcons.packageCheck, size: 28, color: AppColors.buttonDark),
+                  Icon(LucideIcons.packageCheck, size: 24, color: AppColors.buttonDark),
                   const SizedBox(width: 8.0),
                   Text('Products', style: AppTextStyles.titleStyle),
                 ],
@@ -134,11 +132,11 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
                   backgroundColor: AppColors.buttonDark,
                   onPressed: _startAddProduct,
                   height: 45.0,
-                  width: 150.0,
+                  width: 140.0,
                 ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16.0),
           if (_showForm) ...[
                 AddEditProductForm(
                   isEdit: _isEditMode,
@@ -146,29 +144,22 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
                   onSubmit: _handleFormSubmit,
                   onCancel: _cancelForm,
                 ),
-                const SizedBox(height: 20.0),
+                const SizedBox(height: 16.0),
           ],
-          SizedBox(
-            height: 400.0,
-            width: double.infinity,
-              child: ListView.separated(
-                itemCount: _products.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 16.0),
-                itemBuilder: (context, index) {
-                  final product = _products[index];
-                  return _ProductCard(
-                    productName: product.name,
-                    category: product.category.name,
-                    description: product.description,
-                    cost: product.unitPrice,
-                    price: product.sellingPrice,
+          ... _products.map((pro) => Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: _ProductCard(
+                  productName: pro.name,
+                    category: pro.category.name,
+                    description: pro.description,
+                    cost: pro.unitPrice,
+                    price: pro.sellingPrice,
                     createdBy: 'Admin User', 
-                    onEdit: () => _startEditProduct(product),
-                    onDelete: () => _deleteProduct(product.id),
-                  );
-                },
-              ),
-          ),
+                    onEdit: () => _startEditProduct(pro),
+                    onDelete: () => _deleteProduct(pro.id),
+                )
+            )
+          )
         ],
       ),
     );
@@ -218,6 +209,9 @@ class _ProductCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
+                      height: 35.0,
+                      width: 35.0,
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(6.0),
                         border: Border.all(color: AppColors.textFieldBorder),
@@ -228,10 +222,13 @@ class _ProductCard extends StatelessWidget {
                         tooltip: 'Edit',
                       ),
                     ),
-                    const SizedBox(width: 8.0),
+                    const SizedBox(width: 4.0),
                     Container(
+                      height: 35.0,
+                      width: 35.0,
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(6.0),
                         border: Border.all(color: AppColors.textFieldBorder),
                       ),
                       child: IconButton(
@@ -250,16 +247,14 @@ class _ProductCard extends StatelessWidget {
             Text(description, style: AppTextStyles.labelStyle),
             const SizedBox(height: 8.0),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Buy: \$${cost.toStringAsFixed(2)}', style: AppTextStyles.subtitle.copyWith(color: AppColors.pinkRedIcon)),
-                const SizedBox(width: 16.0),
                 Text('Sold: \$${price.toStringAsFixed(2)}', style: AppTextStyles.subtitle.copyWith(color: AppColors.greenIcon)),
               ],
             ),
             const SizedBox(height: 12.0),
-            Text('Created by $createdBy', style: AppTextStyles.textFieldLabel),
-            const SizedBox(height: 12.0),
-            
+            Text('Created by $createdBy', style: AppTextStyles.textFieldLabel.copyWith(color: AppColors.textLight)),
           ],
         ),
       ),

@@ -52,10 +52,10 @@ class _CompanyTabSelectorState extends State<CompanyTabSelector> {
             children: [
               Icon(
                 icon,
-                size: 18.0,
+                size: 16.0,
                 color: isSelected ? AppColors.textWhite : AppColors.textDark, 
               ),
-              const SizedBox(width: 8.0), 
+              const SizedBox(width: 4.0), 
               Text(
                 label,
                 style: isSelected ? AppTextStyles.tabSelected.copyWith(color: AppColors.textWhite) : AppTextStyles.tabUnselected, 

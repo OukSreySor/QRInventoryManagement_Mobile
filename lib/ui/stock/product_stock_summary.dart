@@ -60,34 +60,34 @@ class _ProductStockSummaryState extends State<ProductStockSummary> {
         Card(
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(10.0),
             side: BorderSide(color: AppColors.textFieldBorder, width: 1.0),
           ),
           color: Colors.white,
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.only(top: 16.0, bottom: 16.0, left: 8.0, right: 4.0),
             child: Row(
               children: [
                 Icon(LucideIcons.boxes, size: 24.0, color: Colors.black),
-                SizedBox(width: 10.0),
+                SizedBox(width: 8.0),
                 _isLoading
                     ? Text("Loading...", style: AppTextStyles.cardHeader)
                     : Text(
-                      'Inventory ($totalProducts products, $totalStock units)',
+                      'Stock ($totalProducts products, $totalStock units)',
                       style: AppTextStyles.cardHeader
                     ),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 6.0),
+        const SizedBox(height: 8.0),
         if (!_isLoading)
           ..._products.map((product) => Container(
             margin: const EdgeInsets.only(bottom: 8.0),
             decoration: BoxDecoration(
               color: AppColors.cardBackground,
               border: Border.all(color: AppColors.textFieldBorder, width: 1.0),
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(10.0),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -97,7 +97,7 @@ class _ProductStockSummaryState extends State<ProductStockSummary> {
                   Text(
                     product.name,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),

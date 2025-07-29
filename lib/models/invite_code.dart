@@ -28,7 +28,7 @@ class InviteCode {
       'id': id,
       'code': code,
       'isUsed': isUsed,
-      'usedAt': usedAt?.toIso8601String(),
+      'usedAt': usedAt,
     };
   }
 }

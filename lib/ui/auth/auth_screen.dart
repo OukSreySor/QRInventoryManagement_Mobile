@@ -322,7 +322,7 @@ class _AuthScreenState extends State<AuthScreen> {
           const SizedBox(height: 28.0),
           PrimaryButton(
             text:
-                _signUpCompanyTabIndex == 0 ? 'Join Company' : 'Create Company',
+                _signUpCompanyTabIndex == 0 ? 'Join Company' : 'New Company',
             onPressed: () {
               if (_signUpFormKey.currentState!.validate()) {
                 _handleSignUp();

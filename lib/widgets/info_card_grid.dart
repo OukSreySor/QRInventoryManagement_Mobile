@@ -22,26 +22,69 @@ class InfoCardGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8.0,
-        mainAxisSpacing: 8.0,
-        childAspectRatio: 2.4,
-      ),
-      itemCount: cards.length,
-      itemBuilder: (context, index) {
-        final card = cards[index];
-        return InfoCard(
-          icon: card.icon,
-          title: card.title,
-          value: card.value,
-          iconColor: card.iconColor,
-        );
-      },
-    );
+     return Column( 
+      mainAxisSize: MainAxisSize.min, 
+      children: [
+        Row( 
+          mainAxisAlignment: MainAxisAlignment.spaceAround, 
+          children: [
+            Expanded( 
+              child: Padding(
+                padding: const EdgeInsets.all(4.0), 
+                child: InfoCard(
+                  icon: cards[0].icon,
+                  title: cards[0].title,
+                  value: cards[0].value,
+                  iconColor: cards[0].iconColor,
+                ),
+              ),
+            ),
+            if (cards.length > 1)
+              Expanded( 
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: InfoCard(
+                    icon: cards[1].icon,
+                    title: cards[1].title,
+                    value: cards[1].value,
+                    iconColor: cards[1].iconColor,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 2.0),
+        if (cards.length > 2) 
+          Row( 
+            mainAxisAlignment: MainAxisAlignment.spaceAround, 
+            children: [
+              Expanded( 
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0), 
+                  child: InfoCard(
+                    icon: cards[2].icon,
+                    title: cards[2].title,
+                    value: cards[2].value,
+                    iconColor: cards[2].iconColor,
+                  ),
+                ),
+              ),
+              if (cards.length > 3) 
+                Expanded( 
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0), 
+                    child: InfoCard(
+                      icon: cards[3].icon,
+                      title: cards[3].title,
+                      value: cards[3].value,
+                      iconColor: cards[3].iconColor,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+      ],
+    );  
   }
 }
 
@@ -65,7 +108,7 @@ class InfoCard extends StatelessWidget {
       padding: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(10.0),
         border: Border.all(color: AppColors.borderContainer, width: 1.0),
       ),
       child: Column(

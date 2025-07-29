@@ -58,7 +58,7 @@ class _StockTrendLineChartState extends State<StockTrendLineChart> {
       return Column(
         children: [
           const Padding(
-            padding: EdgeInsets.only(bottom: 8),
+            padding: EdgeInsets.only(bottom: 4),
             child: Text(
               'Stock Trend Overview',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -67,7 +67,7 @@ class _StockTrendLineChartState extends State<StockTrendLineChart> {
           AspectRatio(
             aspectRatio: 1.8,
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(8.0),
               child: LineChart(
                 LineChartData(
                   minY: 0,
@@ -134,7 +134,7 @@ class _StockTrendLineChartState extends State<StockTrendLineChart> {
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const [

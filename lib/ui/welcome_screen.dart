@@ -77,7 +77,8 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.textFieldBorder, width: 2.0),
+                      borderRadius: BorderRadius.circular(8.0),
+                      border: Border.all(color: AppColors.textFieldBorder, width: 1.0),
                     ),
                     child: SizedBox(
                       width: 150.0,

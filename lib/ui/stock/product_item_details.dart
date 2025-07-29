@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_inventory_management/utils/snackbar_helper.dart';
 import '../../DTO/product_item_detail_dto.dart';
 import '../../services/product_service.dart';
 import '../../theme/theme.dart';
+import '../../utils/date_formatter.dart';
 import '../../utils/no_data_place_holder.dart';
 
 class ProductItemDetails extends StatefulWidget {
@@ -78,7 +78,6 @@ class _ProductItemDetailsState extends State<ProductItemDetails> {
       height: 600.0,
       width: double.infinity,
       child: ListView(
-      padding: const EdgeInsets.all(12.0),
       children: [
         Card(
           elevation: 0,
@@ -88,10 +87,10 @@ class _ProductItemDetailsState extends State<ProductItemDetails> {
           ),
           color: Colors.white,
           child: Padding(
-            padding: const EdgeInsets.all(4.0),
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Row(
               children: [
-                _buildHeaderRow(context, 'Product Items Details - ${firstItem.productName}',
+                _buildHeaderRow(context, 'Item Details - ${firstItem.productName}',
                 ),
               ],
             ),
@@ -119,11 +118,11 @@ class _ProductItemDetailsState extends State<ProductItemDetails> {
             onPressed: widget.onBack, 
             tooltip: 'Back to Product Summary',
           ),
-        Text(
-          title,
-          style: AppTextStyles.cardHeader.copyWith(fontSize: 14.0),
-          overflow: TextOverflow.ellipsis,
-        ),
+          Text(
+            title,
+            style: AppTextStyles.cardHeader.copyWith(fontSize: 14.0),
+            overflow: TextOverflow.ellipsis,
+          ),
       ],
     );
   }
@@ -133,10 +132,10 @@ class _ProductItemCard extends StatelessWidget {
   final ProductItemDetailDTO item;
   const _ProductItemCard({required this.item});
    String _formatDate(DateTime? date) {
-    if (date == null || date == DateTime.parse("0001-01-01T00:00:00.000Z")) {
+    if (date == null) {
       return 'N/A';
     }
-    return DateFormat('dd-MM-yyyy').format(date);
+    return DateFormatter.formatDateNumeric(date);
   }
 
   @override
@@ -145,7 +144,7 @@ class _ProductItemCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.cardBackground,
               border: Border.all(color: AppColors.textFieldBorder, width: 1.0),
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(10.0),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -185,7 +184,7 @@ class _ProductItemCard extends StatelessWidget {
                       const Icon(LucideIcons.hash, size: 16.0, color: AppColors.purpleIcon),
                       const SizedBox(width: 4.0),
                       Text(
-                        item.serialNumber,
+                        'Serial-Number: ${item.serialNumber}',
                         style: AppTextStyles.valueStyle
                       ),
                     ],
@@ -214,6 +213,7 @@ class _ProductItemCard extends StatelessWidget {
                   
                   const SizedBox(height: 4.0),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Mfg: ${_formatDate(item.manufacturingDate)}',

@@ -4,8 +4,12 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_inventory_management/DTO/qr_stock_out_dto.dart';
 import 'package:qr_inventory_management/utils/snackbar_helper.dart';
 import '../../../theme/theme.dart';
+import '../../models/product_item_info.dart';
 import '../../services/dio_client.dart';
 import '../../widgets/icon_button.dart';
+import 'scan_qr_code.dart';
+import 'widgets/instruction_box.dart';
+import 'widgets/product_item_info_sheet.dart';
 
 class StockOutSection extends StatefulWidget {
   const StockOutSection({super.key});
@@ -19,6 +23,10 @@ class _StockOutSectionState extends State<StockOutSection> {
 
   bool _itemFound = false;
   bool _isLoading = false;
+
+  bool _isConfirming = false;
+  
+  ProductInfo? _productInfo;
 
   // Call backend to scan and stock out product
   Future<void> _handleScanQrCode() async {
@@ -80,6 +88,95 @@ class _StockOutSectionState extends State<StockOutSection> {
       });
     }
   }
+
+ Future<bool> _fetchProductInfo(String qrCode) async {
+    setState(() {
+      _isLoading = true;
+      _productInfo = null;
+    });
+
+    try {
+      final response = await DioClient.dio.get('/ProductItem/scan', queryParameters: {
+        'code': qrCode,
+      });
+
+      if (response.data['success'] == true) {
+        _productInfo = ProductInfo.fromJson(response.data['data']);
+        return true;
+      } else {
+        SnackbarHelper.error(response.data['message'] ?? 'Product not found.');
+        return false;
+      }
+    } catch (e) {
+      String errorMsg = 'Error fetching product info.';
+      if (e is DioException && e.response?.data != null) {
+        errorMsg = e.response?.data['message'] ?? errorMsg;
+      }
+      SnackbarHelper.error(errorMsg);
+      return false;
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<bool> _confirmStockOut(String qrCode) async {
+    setState(() => _isConfirming = true);
+
+    try {
+      final dto = QrStockOutDto(qrCode: qrCode, soldDate: DateTime.now().toUtc());
+
+      final response = await DioClient.dio.post('/StockOut/scan-out', data: dto.toJson());
+
+      if (response.data['success'] == true) {
+        SnackbarHelper.success(response.data['message'] ?? 'Stocked out successfully!');
+        setState(() {
+          _qrCodeController.clear();
+          _productInfo = null;
+          _itemFound = true;
+        });
+        return true;
+      } else {
+        SnackbarHelper.error(response.data['message'] ?? 'Failed to stock out.');
+        return false;
+      }
+    } catch (e) {
+      String errorMsg = 'Error during stock out.';
+      if (e is DioException && e.response?.data != null) {
+        errorMsg = e.response?.data['message'] ?? errorMsg;
+      }
+      SnackbarHelper.error(errorMsg);
+      return false;
+    } finally {
+      setState(() => _isConfirming = false);
+    }
+  }
+
+  void _showProductInfoSheet(String qrCode) async {
+  final success = await _fetchProductInfo(qrCode);
+  if (!success || !mounted || _productInfo == null) return;
+
+  final confirmed = await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    backgroundColor: AppColors.lightBackground,
+    builder: (_) => ProductInfoSheet(
+      productInfo: _productInfo!,
+      qrCode: qrCode,
+      isConfirming: _isConfirming,
+      onConfirm: _confirmStockOut,
+    ),
+  );
+
+  if (confirmed != true) {
+    setState(() {
+      _qrCodeController.clear();
+    });
+  }
+}
+
 
   @override
   void dispose() {
@@ -164,23 +261,46 @@ class _StockOutSectionState extends State<StockOutSection> {
                     ),
                     const SizedBox(height: 16.0),
                     ActionIconButton(
-                      label:  _isLoading ? 'Processing...' : 'Scan QR Code',
-                      icon: _isLoading ? LucideIcons.loader : LucideIcons.scanLine,
-                      backgroundColor: AppColors.orangeIcon,
-                      onPressed: _isLoading ? null : () => _handleScanQrCode(),
-                      height: 48.0, 
                       width: double.infinity,
+                      label: (_isLoading || _isConfirming) ? 'Processing...' : 'Scan QR Code',
+                      icon: (_isLoading || _isConfirming) ? LucideIcons.loader : LucideIcons.scanLine,
+                      backgroundColor: AppColors.orangeIcon,
+                      onPressed: (_isLoading || _isConfirming)
+                        ? null
+                        : () async {
+                            String code = _qrCodeController.text.trim();
+
+                            if (code.isEmpty) {
+                              final scannedCode = await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const ScanQRScreen()),
+                              );
+
+                              if (scannedCode != null && scannedCode is String) {
+                                code = scannedCode;
+                                _qrCodeController.text = code;
+                              } else {
+                                return;
+                              }
+                            }
+                            final valid = RegExp(r'^PIID\|\d+\|SN\|.+\|PID\|\d+$').hasMatch(code);
+                            if (!valid) {
+                              SnackbarHelper.error('Invalid QR format.');
+                              return;
+                            }
+                            _showProductInfoSheet(code);
+                        },
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 28.0),
+              const SizedBox(height: 16.0),
               if (_itemFound)
                 Container(
                   padding: const EdgeInsets.all(20.0),
                   decoration: BoxDecoration(
                     color: const Color(0xFFE6F5EC),
-                    borderRadius: BorderRadius.circular(16.0),
+                    borderRadius: BorderRadius.circular(10.0),
                     border: Border.all(color: const Color(0xFFB1E3C1)),
                   ),
                   child: Column(
@@ -211,43 +331,7 @@ class _StockOutSectionState extends State<StockOutSection> {
                   ),
                 ),
               const SizedBox(height: 16.0),
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD2DEF9),
-                  borderRadius: BorderRadius.circular(12.0),
-                  border: Border.all(color: AppColors.borderContainer, width: 1.0)
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(Icons.info_outline, color: AppColors.primaryBlue),
-                    const SizedBox(width: 12.0),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'How to use Stock Out',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15.0,
-                              color: AppColors.darkBlue,
-                            ),
-                          ),
-                          SizedBox(height: 8.0),
-                          Text(
-                            '1. Scan the QR code\n'
-                            '2. Manually enter the QR code\n'
-                            '3. Click “Scan QR Code” to confirm the transaction',
-                            style: TextStyle(fontSize: 14.0, color: Color(0xFF133782)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              InstructionBox(),
             ],
           ),
         ),

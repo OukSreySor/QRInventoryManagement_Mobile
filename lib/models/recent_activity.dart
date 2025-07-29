@@ -1,5 +1,5 @@
-import 'package:intl/intl.dart';
-import 'package:timeago/timeago.dart' as timeago; 
+import 'package:timeago/timeago.dart' as timeago;
+import '../utils/date_formatter.dart'; 
 
 class RecentActivity {
   final String productName;
@@ -32,17 +32,17 @@ class RecentActivity {
     final difference = now.difference(transactionDate); 
 
     if (difference.inDays == 0) {
-      return DateFormat('HH:mm a').format(transactionDate);
+      return DateFormatter.formatTimeShort(transactionDate);
     } else if (difference.inDays == 1) {
-      return 'Yesterday ${DateFormat('HH:mm a').format(transactionDate)}';
+      return 'Yesterday ${DateFormatter.formatTimeShort(transactionDate)}';
     } else if (difference.inDays > 1 && difference.inDays < 7) {
-      return '${difference.inDays} days ago ${DateFormat('HH:mm a').format(transactionDate)}';
+      return '${difference.inDays} days ago ${DateFormatter.formatTimeShort(transactionDate)}';
     } else {
       return timeago.format(transactionDate, locale: 'en_short');
     }
   }
 
   String get formattedTransactionDate {
-    return DateFormat('MMM dd, yyyy - HH:mm a').format(transactionDate); 
+    return DateFormatter.formatDateTimeLong(transactionDate); 
   }
 }

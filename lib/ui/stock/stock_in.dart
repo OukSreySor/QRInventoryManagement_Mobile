@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_inventory_management/models/product_dropdown.dart';
 
@@ -7,6 +6,7 @@ import '../../DTO/product_item_stock_in_dto.dart';
 import '../../services/dio_client.dart';
 
 import '../../theme/theme.dart';
+import '../../utils/date_formatter.dart';
 import '../../utils/snackbar_helper.dart';
 import '../../utils/stock_in_date_validator.dart';
 import '../../widgets/custom_text_feild.dart';
@@ -76,7 +76,7 @@ class _StockInSectionState extends State<StockInSection> {
 
     if (picked != null) {
       setState(() {
-        controller.text = "${picked.year}-${picked.month}-${picked.day}";
+        controller.text = "${picked.day}-${picked.month}-${picked.year}";
       });
     }
   }
@@ -91,13 +91,13 @@ class _StockInSectionState extends State<StockInSection> {
   }
   
   try {
-    final manufacturingDate = DateFormat('yyyy-MM-dd').parse(_mfgDateController.text).toUtc();
-    final expiryDate = DateFormat('yyyy-MM-dd').parse(_expDateController.text).toUtc();
-    final addedDate = DateTime.now().toUtc();
+    final manufacturingDate = DateFormatter.parseDate(_mfgDateController.text);
+    final expiryDate = DateFormatter.parseDate(_expDateController.text);
+    final addedDate = DateTime.now();
 
     final validator = StockInDateValidator(
-      manufacturingDate: manufacturingDate,
-      expiryDate: expiryDate,
+      manufacturingDate: manufacturingDate!,
+      expiryDate: expiryDate!,
       addedDate: addedDate,
     );
 
@@ -225,8 +225,8 @@ class _StockInSectionState extends State<StockInSection> {
               children: [
                 Expanded(
                   child: CustomTextField(
-                    label: 'Manufacturing Date',
-                    hintText: 'yyyy-mm-dd',
+                    label: 'Manufacture Date',
+                    hintText: 'd-m-y',
                     controller: _mfgDateController,
                     readOnly: true,
                     onTap: () => _selectDate(context, _mfgDateController),
@@ -240,11 +240,11 @@ class _StockInSectionState extends State<StockInSection> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 16.0),
+                const SizedBox(width: 4.0),
                 Expanded(
                   child: CustomTextField(
                     label: 'Expiry Date',
-                    hintText: 'yyyy-mm-dd',
+                    hintText: 'd-m-y',
                     controller: _expDateController,
                     readOnly: true,
                     onTap: () => _selectDate(context, _expDateController),

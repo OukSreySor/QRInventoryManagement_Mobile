@@ -23,7 +23,7 @@ class UserDTO {
       'passwordHash': user.passwordHash,
       'role': user.role,
       'refreshToken': user.refreshToken,
-      'refreshTokenExpiryTime': user.refreshTokenExpiryTime?.toIso8601String(),
+      'refreshTokenExpiryTime': user.refreshTokenExpiryTime,
       'email': user.email,
       'isDeleted': user.isDeleted
     };

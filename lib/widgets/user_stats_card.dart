@@ -32,7 +32,7 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12.0), 
+      padding: const EdgeInsets.all(8.0), 
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(10.0),
@@ -43,12 +43,12 @@ class InfoCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: iconColor, size: 20.0), 
+              Icon(icon, color: iconColor, size: 16.0), 
               const SizedBox(width: 6.0), 
               Expanded( 
                 child: Text(
                   title,
-                  style: AppTextStyles.labelStyle.copyWith(fontSize: 12.0, fontWeight: FontWeight.bold), 
+                  style: AppTextStyles.labelStyle.copyWith(fontSize: 11.0, fontWeight: FontWeight.bold), 
                   overflow: TextOverflow.ellipsis, 
                 ),
               ),
@@ -70,8 +70,9 @@ class InfoCard extends StatelessWidget {
 
 class UserStatsCard extends StatelessWidget {
   final List<CardData> cards;
+  final double cardWidth;
 
-  const UserStatsCard({super.key, required this.cards});
+  const UserStatsCard({super.key, required this.cards, this.cardWidth = 130});
 
   @override
   Widget build(BuildContext context) {
@@ -79,21 +80,23 @@ class UserStatsCard extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: cards.map((cardData) {
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: cards.map((cardData) {
+          return Container(
+            width: cardWidth, 
+            padding: const EdgeInsets.only(right: 8.0),
             child: InfoCard(
               icon: cardData.icon,
               title: cardData.title,
               value: cardData.value,
               iconColor: cardData.iconColor,
             ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }

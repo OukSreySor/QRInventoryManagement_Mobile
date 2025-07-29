@@ -31,115 +31,115 @@ class AppColors {
 
 class AppTextStyles {
   static TextStyle headline = GoogleFonts.montserrat(
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: FontWeight.w800,
     color: AppColors.textBlack,
   );
 
   static TextStyle subtitle = GoogleFonts.montserrat(
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: FontWeight.w500,
     color: AppColors.textDark,
   );
 
   static TextStyle tabSelected = GoogleFonts.montserrat(
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: FontWeight.w600,
     color: AppColors.textBlack,
   );
 
   static TextStyle tabUnselected = GoogleFonts.montserrat(
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: FontWeight.w500,
     color: AppColors.textDark,
   );
 
   static TextStyle infoCardTitle = GoogleFonts.montserrat(
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: FontWeight.w500,
     color: AppColors.textDark,
   );
 
   static TextStyle infoCardValue = GoogleFonts.montserrat(
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: FontWeight.w700,
     color: AppColors.textDark,
   );
 
   static TextStyle sectionTitle = GoogleFonts.montserrat(
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: FontWeight.w700,
     color: AppColors.textDark,
   );
 
   static TextStyle sectionDescription = GoogleFonts.montserrat(
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: FontWeight.w500,
     color: AppColors.textLight,
   );
 
   static TextStyle bannerHeadline = GoogleFonts.montserrat(
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: FontWeight.w600,
     color: AppColors.textWhite,
   );
 
   static TextStyle bannerDescription = GoogleFonts.montserrat(
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: FontWeight.w500,
     color: AppColors.textWhite,
   );
 
   static TextStyle authSectionTitle = GoogleFonts.montserrat(
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: FontWeight.w700,
     color: AppColors.textBlack,
   );
 
   static TextStyle authSectionDescription = GoogleFonts.montserrat(
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: FontWeight.w500,
     color: AppColors.textDark,
   );
 
   static TextStyle textFieldLabel = GoogleFonts.montserrat(
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: FontWeight.w500,
     color: AppColors.textBlack,
   );
 
   static TextStyle buttonText = GoogleFonts.montserrat(
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: FontWeight.w600,
     color: AppColors.textWhite,
   );
 
   static TextStyle secondaryButtonText = GoogleFonts.montserrat(
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: FontWeight.w600,
     color: AppColors.textDark,
   );
 
   static TextStyle cardHeader = GoogleFonts.montserrat(
-    fontSize: 17,
-    fontWeight: FontWeight.w700,
-    color: AppColors.textBlack,
-  );
-
-  static TextStyle titleStyle = GoogleFonts.montserrat(
     fontSize: 15,
     fontWeight: FontWeight.w600,
     color: AppColors.textBlack,
   );
 
-  static TextStyle labelStyle = GoogleFonts.montserrat(
+  static TextStyle titleStyle = GoogleFonts.montserrat(
     fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textBlack,
+  );
+
+  static TextStyle labelStyle = GoogleFonts.montserrat(
+    fontSize: 13,
     fontWeight: FontWeight.w500,
     color: AppColors.textBlack,
   );
 
   static TextStyle valueStyle = GoogleFonts.montserrat(
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: FontWeight.bold,
     color: AppColors.textBlack,
   );

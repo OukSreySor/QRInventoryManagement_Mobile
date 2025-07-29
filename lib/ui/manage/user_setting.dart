@@ -93,12 +93,12 @@ class _InviteCodesContainerState extends State<InviteCodesContainer> {
     return Column(
       children: [
         UserStatsCard(cards: statsCards),
-        const SizedBox(height: 16.0),
+        const SizedBox(height: 8.0),
         Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
             color: AppColors.cardBackground,
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(10.0),
             border: Border.all(color: AppColors.textFieldBorder),
           ),
           child: Column(
@@ -231,7 +231,7 @@ class _InviteCodesContainerState extends State<InviteCodesContainer> {
                     final code = inviteCodes[index];
                     return InviteCodeItem(
                       code: code.code,
-                      created: code.createdAt?.toLocal().toString().split(' ')[0] ?? 'N/A',
+                      created: code.createdAt?.toString().split(' ')[0] ?? 'N/A',
                       status: code.isUsed ? 'Used' : 'Unused',
                     );
                   },
@@ -271,10 +271,6 @@ class _InviteCodesContainerState extends State<InviteCodesContainer> {
                   Expanded(
                     flex: 3,
                     child: Text('Users', style: AppTextStyles.titleStyle),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Text('Status', style: AppTextStyles.titleStyle),
                   ),
                   Expanded(
                     flex: 2,
@@ -439,13 +435,6 @@ class _UserItemState extends State<UserItem> {
 }
   @override
   Widget build(BuildContext context) {
-    Color statusColor = AppColors.textBlack; 
-    if (widget.status == 'Deleted') {
-      statusColor = AppColors.pinkRedIcon; 
-    } else if (widget.status == 'Active') {
-      statusColor = AppColors.greenIcon; 
-    }
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -460,10 +449,6 @@ class _UserItemState extends State<UserItem> {
                 Text(widget.email, style: AppTextStyles.valueStyle),
               ],
             ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Text(widget.status, style: AppTextStyles.valueStyle.copyWith(color: statusColor)),
           ),
           Expanded(
             flex: 2,

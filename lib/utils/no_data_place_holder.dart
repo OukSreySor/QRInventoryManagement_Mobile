@@ -20,7 +20,7 @@ class NoDataPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(36.0), 
+      padding: const EdgeInsets.all(28.0), 
       decoration: BoxDecoration(
         color: Colors.white, 
         borderRadius: BorderRadius.circular(10.0), 
@@ -39,7 +39,7 @@ class NoDataPlaceholder extends StatelessWidget {
             Text(
               title,
               style: const TextStyle(
-                fontSize: 18.0,
+                fontSize: 16.0,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textBlack,
               ),
@@ -50,7 +50,7 @@ class NoDataPlaceholder extends StatelessWidget {
               Text(
                 message!,
                 style: TextStyle(
-                  fontSize: 14.0,
+                  fontSize: 12.0,
                   color: AppColors.textMedium,
                 ),
                 textAlign: TextAlign.center,

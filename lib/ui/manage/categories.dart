@@ -4,6 +4,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../models/category.dart';
 import '../../services/category_service.dart';
 import '../../theme/theme.dart';
+import '../../utils/confirm_dialog.dart';
+import '../../utils/no_data_place_holder.dart';
 import '../../utils/snackbar_helper.dart';
 import '../../widgets/icon_button.dart';
 import 'widgets/add_edit_category_form.dart';
@@ -44,16 +46,13 @@ class _CategoriesState extends State<Categories> {
   }
 
   void _deleteCategory(int id) async {
-    final confirm = await showDialog<bool>(
+    final confirm = await showConfirmDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Confirm Delete'),
-        content: const Text('Are you sure you want to delete this category?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
-        ],
-      ),
+      title: 'Confirm Delete', 
+      content: 'Are you sure you want to delete this category?',
+      confirmText: 'Yes',
+      cancelText: 'No',
+      confirmColor: AppColors.pinkRedIcon,
     );
     if (confirm != true) return;
 
@@ -87,12 +86,22 @@ class _CategoriesState extends State<Categories> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+    if (_categories.isEmpty) {
+      return const NoDataPlaceholder(
+        title: 'No category in Inventory',
+        message: 'Start by adding some category using the “Manage” tab',
+        icon: LucideIcons.box, 
+      );
+    }
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.textFieldBorder),
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(color: AppColors.textFieldBorder, width: 1.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +111,7 @@ class _CategoriesState extends State<Categories> {
             children: [
               Row(
                 children: [
-                  Icon(LucideIcons.folder, size: 28, color: AppColors.buttonDark),
+                  Icon(LucideIcons.folder, size: 24, color: AppColors.buttonDark),
                   const SizedBox(width: 8.0),
                   Text('Categories', style: AppTextStyles.titleStyle),
                 ],
@@ -114,11 +123,11 @@ class _CategoriesState extends State<Categories> {
                   backgroundColor: AppColors.buttonDark,
                   onPressed: () => setState(() => _showAddForm = true),
                   height: 45.0,
-                  width: 150.0,
+                  width: 140.0,
                 ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           if (_showAddForm)
             AddCategoryForm(
               isEdit: _isEditMode,
@@ -158,7 +167,7 @@ class _CategoriesState extends State<Categories> {
             const Text('No categories found.')
           else
             ..._categories.map((cat) => Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.only(bottom: 8),
                   child: _CategoryCard(
                     categoryName: cat.name,
                     description: cat.description ,
@@ -198,7 +207,7 @@ class _CategoryCard extends StatelessWidget {
       color: AppColors.cardBackground,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(width: 1.0, color: AppColors.textFieldBorder),
+        side: BorderSide(width: 2.0, color: AppColors.textFieldBorder),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -213,6 +222,9 @@ class _CategoryCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
+                      height: 35.0,
+                      width: 35.0,
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(6.0),
                         border: Border.all(color: AppColors.textFieldBorder),
@@ -225,14 +237,18 @@ class _CategoryCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8.0),
                     Container(
+                      height: 35.0,
+                      width: 35.0,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8.0),
                         border: Border.all(color: AppColors.textFieldBorder),
                       ),
+                      alignment: Alignment.center,
                       child: IconButton(
                         icon: const Icon(LucideIcons.trash2, color: AppColors.buttonDark, size: 20),
-                        onPressed: onDelete,
                         tooltip: 'Delete',
+                        onPressed: onDelete,
+                        padding: EdgeInsets.zero,
                       ),
                     ),
                   ],
@@ -242,7 +258,7 @@ class _CategoryCard extends StatelessWidget {
             const SizedBox(height: 12.0),
             Text(description, style: AppTextStyles.labelStyle),
             const SizedBox(height: 4.0),
-            Text('Created by $createdBy', style: AppTextStyles.textFieldLabel),
+            Text('Created by $createdBy', style: AppTextStyles.textFieldLabel.copyWith(color: AppColors.textLight)),
           ],
         ),
       ),
