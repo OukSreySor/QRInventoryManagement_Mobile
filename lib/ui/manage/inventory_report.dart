@@ -177,7 +177,7 @@ class _InventoryReportsScreenState extends State<InventoryReportsScreen> {
   }
 
   Widget _buildDatePickerField(String label, DateTime? date, VoidCallback onTap) {
-    final text = date == null ? label : '${date.day.toString().padLeft(2,'0')}-${date.month.toString().padLeft(2,'0')}-${date.year}';
+    final text = date == null ? label : '${date.year}-${date.month.toString().padLeft(2,'0')}-${date.day.toString().padLeft(2,'0')}';
     return GestureDetector(
       onTap: onTap,
       child: Container(

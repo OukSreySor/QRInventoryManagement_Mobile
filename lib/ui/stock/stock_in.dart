@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_inventory_management/models/product_dropdown.dart';
 
@@ -76,7 +77,7 @@ class _StockInSectionState extends State<StockInSection> {
 
     if (picked != null) {
       setState(() {
-        controller.text = "${picked.day}-${picked.month}-${picked.year}";
+        controller.text = DateFormat('yyyy-MM-dd').format(picked);
       });
     }
   }
@@ -226,7 +227,7 @@ class _StockInSectionState extends State<StockInSection> {
                 Expanded(
                   child: CustomTextField(
                     label: 'Manufacture Date',
-                    hintText: 'd-m-y',
+                    hintText: 'y-m-d',
                     controller: _mfgDateController,
                     readOnly: true,
                     onTap: () => _selectDate(context, _mfgDateController),
@@ -244,7 +245,7 @@ class _StockInSectionState extends State<StockInSection> {
                 Expanded(
                   child: CustomTextField(
                     label: 'Expiry Date',
-                    hintText: 'd-m-y',
+                    hintText: 'y-m-d',
                     controller: _expDateController,
                     readOnly: true,
                     onTap: () => _selectDate(context, _expDateController),

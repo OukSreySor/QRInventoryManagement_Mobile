@@ -10,6 +10,7 @@ class ProductItemDetailDTO {
   final String productName;
   final String userName;
   final DateTime addedDate;
+  final String status;
 
   ProductItemDetailDTO({
     required this.id,
@@ -23,6 +24,7 @@ class ProductItemDetailDTO {
     required this.productName,
     required this.userName,
     required this.addedDate,
+    required this.status
   });
 
   factory ProductItemDetailDTO.fromJson(Map<String, dynamic> json) {
@@ -38,6 +40,7 @@ class ProductItemDetailDTO {
       productName: json['productName'],
       userName: json['userName'],
       addedDate: DateTime.parse(json['addedDate']),
+      status: json['status']
     );
   }
 }

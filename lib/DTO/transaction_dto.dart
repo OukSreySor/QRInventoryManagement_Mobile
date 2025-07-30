@@ -26,7 +26,7 @@ class TransactionDTO {
       'userId': transaction.userId,
       'user': UserDTO.toJson(transaction.user),
       'transactionType': transaction.transactionType.toString().split('.').last,
-      'transactionDate': transaction.transactionDate,
+      'transactionDate': transaction.transactionDate.toIso8601String(),
     };
   }
 }

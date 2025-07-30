@@ -17,9 +17,9 @@ class ProductItemStockInDto {
     return {
       'Serial_Number': serialNumber,
       'ProductId': productId,
-      'Manufacturing_Date': manufacturingDate,
-      'Expiry_Date': expiryDate,
-      'AddedDate': addedDate,
+      'Manufacturing_Date': manufacturingDate.toIso8601String(),
+      'Expiry_Date': expiryDate.toIso8601String(),
+      'AddedDate': addedDate.toIso8601String(),
     };
   }
 }

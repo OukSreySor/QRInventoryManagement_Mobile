@@ -23,7 +23,7 @@ class StockOutDTO {
       'productItem': ProductItemDTO.toJson(stockOut.productItem),
       'userId': stockOut.userId,
       'user': UserDTO.toJson(stockOut.user),
-      'soldDate': stockOut.soldDate,
+      'soldDate': stockOut.soldDate.toIso8601String(),
     };
   }
 }

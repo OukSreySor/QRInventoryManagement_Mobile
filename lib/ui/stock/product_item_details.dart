@@ -42,6 +42,10 @@ class _ProductItemDetailsState extends State<ProductItemDetails> {
   Future<void> _fetchProductItems() async {
     try {
       final items = await ProductService().getItemsByProduct(widget.productId);
+
+      // Sort items by addedDate descending
+      items.sort((a, b) => b.addedDate.compareTo(a.addedDate));
+      
       setState(() {
         _items = items;
         _isLoading = false;
@@ -74,10 +78,10 @@ class _ProductItemDetailsState extends State<ProductItemDetails> {
     }
      final firstItem = _items.first;
 
-    return SizedBox(
-      height: 600.0,
-      width: double.infinity,
-      child: ListView(
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Card(
           elevation: 0,
@@ -153,10 +157,31 @@ class _ProductItemCard extends StatelessWidget {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        item.productName,
-                        style: AppTextStyles.titleStyle,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.productName,
+                              style: AppTextStyles.titleStyle,
+                            ),
+                            const SizedBox(height: 4.0),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                              decoration: BoxDecoration(
+                                color: AppColors.lightBackground,
+                                border: Border.all(color: AppColors.textFieldBorder),
+                                borderRadius: BorderRadius.circular(6.0),
+                              ),
+                              child: Text(
+                                item.status, 
+                                style: AppTextStyles.valueStyle.copyWith(color: AppColors.darkBlue),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -173,7 +198,6 @@ class _ProductItemCard extends StatelessWidget {
                             'Cost: \$${item.unitPrice.toStringAsFixed(2)}',
                             style: AppTextStyles.valueStyle.copyWith(color: AppColors.pinkRedIcon),
                           ),
-                          
                         ],
                       ),
                     ],

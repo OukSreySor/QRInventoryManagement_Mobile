@@ -27,7 +27,7 @@ class DateFormatter {
   }
 
   // Parse string to DateTime
-  static DateTime? parseDate(String dateString, {String format = 'dd-MM-yyyy'}) {
+  static DateTime? parseDate(String dateString, {String format = 'yyyy-MM-dd'}) {
     try {
       return DateFormat(format).parse(dateString);
     } catch (e) {

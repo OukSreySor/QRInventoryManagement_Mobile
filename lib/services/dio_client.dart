@@ -5,7 +5,7 @@ class DioClient {
   static final Dio _dio = Dio(BaseOptions(
     //baseUrl: 'http://localhost:5134/api',
     //baseUrl: 'http://10.0.2.2:5000/api',
-    baseUrl: 'http://192.168.110.149:5000/api',
+    baseUrl: 'http://192.168.18.229:5000/api',
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
   ));

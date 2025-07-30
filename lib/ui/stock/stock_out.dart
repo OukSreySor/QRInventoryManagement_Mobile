@@ -48,7 +48,7 @@ class _StockOutSectionState extends State<StockOutSection> {
     try {
       final dto = QrStockOutDto(
         qrCode: qrCode,
-        soldDate: DateTime.now().toUtc()
+        soldDate: DateTime.now()
       );
 
       final response = await DioClient.dio.post(
@@ -123,7 +123,7 @@ class _StockOutSectionState extends State<StockOutSection> {
     setState(() => _isConfirming = true);
 
     try {
-      final dto = QrStockOutDto(qrCode: qrCode, soldDate: DateTime.now().toUtc());
+      final dto = QrStockOutDto(qrCode: qrCode, soldDate: DateTime.now());
 
       final response = await DioClient.dio.post('/StockOut/scan-out', data: dto.toJson());
 
