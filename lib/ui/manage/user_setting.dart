@@ -4,9 +4,10 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_inventory_management/utils/confirm_dialog.dart';
 import 'package:qr_inventory_management/widgets/primary_button.dart';
 
+import '../../DTO/user_dto.dart';
 import '../../models/invite_code.dart';
 import '../../models/user.dart';
-import '../../services/admin_service.dart';
+import '../../services/api_service.dart';
 import '../../theme/theme.dart';
 import '../../widgets/user_stats_card.dart';
 
@@ -23,7 +24,7 @@ class _InviteCodesContainerState extends State<InviteCodesContainer> {
   String? newInviteCode;
   bool isLoading = true;
 
-  final _adminService = AdminService();
+  final _apiService = ApiService();
 
   @override
   void initState() {
@@ -33,17 +34,30 @@ class _InviteCodesContainerState extends State<InviteCodesContainer> {
 
   Future<void> _loadData() async {
     try {
-      final fetchedUsers = await _adminService.getAllUsers();
-      final fetchedCodes = await _adminService.getAllInviteCodes();
+      final fetchedUsers = await _apiService.get<List<User>>(
+        '/Admin/users',
+        context: context,
+        fromJson: (data) {
+          final List usersJson = data['data'];
+          return usersJson.map((e) => UserDTO.fromJson(e)).toList();
+        },
+      );
+
+      final fetchedCodes = await _apiService.get<List<InviteCode>>(
+        '/Admin/invite-codes',
+        context: context,
+        fromJson: (data) {
+          final List codesJson = data['data'];
+          return codesJson.map((e) => InviteCode.fromJson(e)).toList();
+        },
+      );
+
       setState(() {
-        users = fetchedUsers;
-        inviteCodes = fetchedCodes;
+        users = fetchedUsers ?? [];
+        inviteCodes = fetchedCodes ?? [];
         isLoading = false;
       });
     } catch (e) {
-      // Handle error
-      print("Error loading data: $e");
-    } finally {
       setState(() {
         isLoading = false;
       });
@@ -52,14 +66,23 @@ class _InviteCodesContainerState extends State<InviteCodesContainer> {
 
   Future<void> handleGenerateCode() async {
     try {
-      final code = await _adminService.generateInviteCode();
-      setState(() {
-        newInviteCode = code;
-      });
+      final code = await ApiService().post<String>(
+        '/Admin/generate-invite-code', 
+        {}, // no body
+        context: context,
+        fromJson: (data) => data['data'], 
+      );
+
+      if (code != null) {
+        setState(() {
+          newInviteCode = code;
+        });
+      }
     } catch (e) {
       print("Failed to generate code: $e");
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -299,11 +322,18 @@ class _InviteCodesContainerState extends State<InviteCodesContainer> {
                       role: user.role,
                       userId: user.id,
                       onRoleChanged: (newRole) async {
-                        await _adminService.updateUserRole(user.id, newRole);
+                        await _apiService.put(
+                          '/Admin/user-role/${user.id}',
+                          {'role': newRole},
+                          context: context,
+                        );
                         _loadData();
                       },
                       onDelete: () async {
-                        await _adminService.deleteUser(user.id);
+                        await _apiService.delete(
+                          '/Admin/user/${user.id}',
+                          context: context,
+                        );
                         _loadData();
                       },
                     );

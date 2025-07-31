@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_inventory_management/utils/snackbar_helper.dart';
+import '../../DTO/product_dto.dart';
 import '../../models/product.dart';
-import '../../services/product_service.dart';
+import '../../services/api_service.dart';
 import '../../theme/theme.dart';
 import '../../utils/confirm_dialog.dart';
 import '../../utils/no_data_place_holder.dart';
@@ -19,7 +20,7 @@ class ProductsManagementScreen extends StatefulWidget {
 }
 
 class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
-  final ProductService _productService = ProductService();
+  final ApiService _apiService = ApiService();
   
   List<Product> _products = [];
   bool _isLoading = true;
@@ -34,15 +35,29 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
   }
 
   Future<void> _loadProducts() async {
-    setState(() => _isLoading = true);
-    try {
-       _products = await _productService.getAllProducts();
-    } catch (e) {
-      SnackbarHelper.error('Failed to fetch products');
-    } finally {
-      setState(() => _isLoading = false);
+  setState(() => _isLoading = true);
+  try {
+    final products = await _apiService.get<List<Product>>(
+      '/Product',
+      context: context,
+      fromJson: (data) {
+        final List items = data['data'];
+        return items.map((e) => ProductDTO.fromJson(e)).toList();
+      },
+    );
+
+    if (products != null) {
+      setState(() {
+        _products = products;
+      });
     }
+  } catch (e) {
+    SnackbarHelper.error('Failed to fetch products');
+  } finally {
+    setState(() => _isLoading = false);
   }
+}
+
 
   void _startAddProduct() {
     setState(() {
@@ -81,10 +96,18 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
     if (confirmed != true) return;
 
     try {
-      await _productService.deleteProduct(productId, context);
-      SnackbarHelper.success('Product deleted');
-      await _loadProducts();
-    } catch (_) {}
+      final deleted = await _apiService.delete<bool>(
+        '/Product/$productId',
+        context: context,
+        fromJson: (data) => data['success'] == true,
+      );
+      if (deleted == true) {
+        SnackbarHelper.success('Product deleted');
+        await _loadProducts();
+      }
+    } catch (_) {
+      SnackbarHelper.error('Failed to delete product');
+    }
   }
 
   Future<void> _handleFormSubmit() async {
@@ -93,77 +116,84 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
-    }
-    if (_products.isEmpty) {
-      return const NoDataPlaceholder(
-        title: 'No product in Inventory',
-        message: 'Start by adding some product using the “Manage” tab',
-        icon: LucideIcons.box, 
-      );
-    }
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(color: AppColors.textFieldBorder, width: 2.0)
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(LucideIcons.packageCheck, size: 24, color: AppColors.buttonDark),
-                  const SizedBox(width: 8.0),
-                  Text('Products', style: AppTextStyles.titleStyle),
-                ],
+Widget build(BuildContext context) {
+  if (_isLoading) {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  return Container(
+    padding: const EdgeInsets.all(16.0),
+    decoration: BoxDecoration(
+      color: AppColors.cardBackground,
+      borderRadius: BorderRadius.circular(10.0),
+      border: Border.all(color: AppColors.textFieldBorder, width: 2.0),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        /// Header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(LucideIcons.packageCheck, size: 24, color: AppColors.buttonDark),
+                const SizedBox(width: 8.0),
+                Text('Products', style: AppTextStyles.titleStyle),
+              ],
+            ),
+            if (!_showForm)
+              ActionIconButton(
+                label: 'Add Product',
+                icon: LucideIcons.plus,
+                backgroundColor: AppColors.buttonDark,
+                onPressed: _startAddProduct,
+                height: 45.0,
+                width: 140.0,
               ),
-              /// Show Add button only if form hidden
-              if (!_showForm)
-                ActionIconButton(
-                  label: 'Add Product',
-                  icon: LucideIcons.plus,
-                  backgroundColor: AppColors.buttonDark,
-                  onPressed: _startAddProduct,
-                  height: 45.0,
-                  width: 140.0,
-                ),
-            ],
+          ],
+        ),
+        const SizedBox(height: 16.0),
+
+        /// Form
+        if (_showForm) ...[
+          AddEditProductForm(
+            isEdit: _isEditMode,
+            initialProduct: _editingProduct,
+            onSubmit: _handleFormSubmit,
+            onCancel: _cancelForm,
           ),
           const SizedBox(height: 16.0),
-          if (_showForm) ...[
-                AddEditProductForm(
-                  isEdit: _isEditMode,
-                  initialProduct: _editingProduct,
-                  onSubmit: _handleFormSubmit,
-                  onCancel: _cancelForm,
-                ),
-                const SizedBox(height: 16.0),
-          ],
-          ... _products.map((pro) => Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: _ProductCard(
-                  productName: pro.name,
-                    category: pro.category.name,
-                    description: pro.description,
-                    cost: pro.unitPrice,
-                    price: pro.sellingPrice,
-                    createdBy: 'Admin User', 
-                    onEdit: () => _startEditProduct(pro),
-                    onDelete: () => _deleteProduct(pro.id),
-                )
-            )
-          )
         ],
-      ),
-    );
-  }
+
+        /// No data
+        if (_products.isEmpty && !_showForm)
+          const NoDataPlaceholder(
+            title: 'No product in Inventory',
+            message: 'Start by adding some new product.',
+            icon: LucideIcons.box,
+          ),
+
+        /// Products list
+        ..._products.map(
+          (pro) => Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: _ProductCard(
+              productName: pro.name,
+              category: pro.category.name,
+              description: pro.description,
+              cost: pro.unitPrice,
+              price: pro.sellingPrice,
+              createdBy: pro.userName ?? 'Unknown',
+              onEdit: () => _startEditProduct(pro),
+              onDelete: () => _deleteProduct(pro.id),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 }
 
 class _ProductCard extends StatelessWidget {
@@ -204,7 +234,15 @@ class _ProductCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(productName, style: AppTextStyles.titleStyle),
+                Expanded(
+                  child: Text(
+                    productName, 
+                    style: AppTextStyles.titleStyle,
+                    overflow: TextOverflow.visible,
+                    softWrap: true,
+                    maxLines: 2,
+                  ),
+                ),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

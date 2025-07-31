@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:qr_inventory_management/services/inventory_service.dart';
+import '../../../services/api_service.dart';
 import '../../../theme/theme.dart';
 import '../../../models/recent_activity.dart'; 
 
@@ -13,13 +13,35 @@ class RecentActivitySection extends StatefulWidget {
 
 class _RecentActivitySectionState extends State<RecentActivitySection> {
   late Future<List<RecentActivity>> _recentActivitiesFuture;
-  final InventoryService _activityService = InventoryService(); 
+  final ApiService _apiService = ApiService(); 
+
+  Future<List<RecentActivity>> fetchRecentActivities({required BuildContext context, int limit = 5}) async {
+  try {
+    final response = await _apiService.get<Map<String, dynamic>>(
+      '/Transaction/recent-activity',
+      queryParams: {'limit': limit},
+      context: context,
+      fromJson: (data) => data,
+    );
+
+    if (response != null && response['success'] == true) {
+      final List<dynamic> activityData = response['data'];
+      return activityData.map((json) => RecentActivity.fromJson(json)).toList();
+    } else {
+      final String errorMessage = response?['message'] ?? "Failed to load recent activities";
+      throw Exception(errorMessage);
+    }
+  } catch (e) {
+    print('Error fetching recent activities: $e');
+    rethrow;
+  }
+}
 
   @override
   void initState() {
     super.initState();
 
-    _recentActivitiesFuture = _activityService.fetchRecentActivities(limit: 5);
+    _recentActivitiesFuture = fetchRecentActivities(context: context, limit: 5);
   }
 
   @override

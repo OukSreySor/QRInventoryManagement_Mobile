@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../DTO/product_stock_summary_dto.dart';
-import '../../services/product_service.dart';
+import '../../services/api_service.dart';
 import '../../theme/theme.dart';
 
 class ProductStockSummary extends StatefulWidget {
@@ -21,7 +21,7 @@ class _ProductStockSummaryState extends State<ProductStockSummary> {
 
   List<ProductStockSummaryDTO> _products = [];
   bool _isLoading = true;
-
+  
   @override
   void initState() {
     super.initState();
@@ -29,14 +29,29 @@ class _ProductStockSummaryState extends State<ProductStockSummary> {
   }
 
   Future<void> _fetchProductSummary() async {
-    try {
-      final products = await ProductService().fetchProductStockSummary();
+    setState(() => _isLoading = true);
+
+    final api = ApiService();
+    final result = await api.get<List<ProductStockSummaryDTO>>(
+      '/Product/stock-summary',
+      context: context,
+      fromJson: (response) {
+        final data = response['data'];
+        if (data is List) {
+          return data
+              .map((item) => ProductStockSummaryDTO.fromJson(item))
+              .toList();
+        }
+        return [];
+      },
+    );
+
+    if (result != null) {
       setState(() {
-        _products = products;
+        _products = result;
         _isLoading = false;
       });
-    } catch (e) {
-      debugPrint("Error loading product summary: $e");
+    } else {
       setState(() => _isLoading = false);
     }
   }
@@ -44,7 +59,7 @@ class _ProductStockSummaryState extends State<ProductStockSummary> {
   Color _getStockColor(int stock) {
     if (stock <= 1) {
       return Colors.red.shade700;
-    } else if (stock <= 5) {
+    } else if (stock <= 3) {
       return Colors.orange.shade700;
     }
     return Colors.green.shade700;
@@ -103,64 +118,63 @@ class _ProductStockSummaryState extends State<ProductStockSummary> {
                     ),
                   ),
                   const SizedBox(height: 6.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                            product.categoryName,
-                            style: const TextStyle(
-                              fontSize: 14.0,
-                              color: AppColors.darkBlue,
-                              fontWeight: FontWeight.bold
-                            ),
-                          ),
-                          const SizedBox(width: 10.0),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                            decoration: BoxDecoration(
-                              color: _getStockColor(product.quantityInStock),
-                              borderRadius: BorderRadius.circular(18.0),
-                            ),
-                            child: Text(
-                              '${product.quantityInStock} in stock',
-                              style: TextStyle(
-                                color: AppColors.textWhite,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10.0,
-                              ),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        product.categoryName,
+                        style: const TextStyle(
+                          fontSize: 14.0,
+                          color: AppColors.darkBlue,
+                          fontWeight: FontWeight.bold
+                        ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          if (widget.onViewDetails != null) {
-                            widget.onViewDetails!(product.id);
-                          }
-                        },
-                        style: ButtonStyle(
-                          padding: WidgetStateProperty.all(EdgeInsets.zero),
-                          minimumSize: WidgetStateProperty.all(Size.zero),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          foregroundColor: WidgetStateProperty.resolveWith<Color>(
-                            (Set<WidgetState> states) {
-                              if (states.contains(WidgetState.hovered)) {
-                                return AppColors.primaryBlue;
-                              }
-                              return AppColors.textDark;
+                      const SizedBox(height: 8.0),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                        decoration: BoxDecoration(
+                          color: _getStockColor(product.quantityInStock),
+                          borderRadius: BorderRadius.circular(18.0),
+                        ),
+                        child: Text(
+                          '${product.quantityInStock} in stock',
+                          style: TextStyle(
+                            color: AppColors.textWhite,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10.0,
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            if (widget.onViewDetails != null) {
+                              widget.onViewDetails!(product.id);
                             }
+                          },
+                          style: ButtonStyle(
+                            padding: WidgetStateProperty.all(EdgeInsets.zero),
+                            minimumSize: WidgetStateProperty.all(Size.zero),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                              (Set<WidgetState> states) {
+                                if (states.contains(WidgetState.hovered)) {
+                                  return AppColors.primaryBlue;
+                                }
+                                return AppColors.textDark;
+                              }
+                            ),
+                            textStyle: WidgetStateProperty.all(
+                            const TextStyle(
+                              fontSize: 14.0,
+                              decoration: TextDecoration.underline, 
+                            ),
                           ),
-                          textStyle: WidgetStateProperty.all(
-                          const TextStyle(
-                            fontSize: 14.0,
-                            decoration: TextDecoration.underline, 
+                        ),
+                          child: const Text(
+                            'View Details',
                           ),
-                      ),
-                    ),
-                        child: const Text(
-                          'View Details',
                         ),
                       )
                     ]

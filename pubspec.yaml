@@ -43,6 +43,8 @@ dependencies:
   fl_chart: ^1.0.0
   timeago: ^3.7.1
   mobile_scanner: ^7.0.1
+  pdf: ^3.11.3
+  printing: ^5.14.2
 
 dev_dependencies:
   flutter_test:

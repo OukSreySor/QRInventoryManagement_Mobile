@@ -7,6 +7,7 @@ class CategoryDTO {
       name: json['name'],
       description: json['description'],
       userId: json['userId'],
+      userName: json['userName'],
       createdAt: json['createAt'] != null
           ? DateTime.parse(json['createAt'])
           : null,

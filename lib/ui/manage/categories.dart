@@ -1,15 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../DTO/category_dto.dart';
 import '../../models/category.dart';
-import '../../services/category_service.dart';
+import '../../services/api_service.dart';
 import '../../theme/theme.dart';
 import '../../utils/confirm_dialog.dart';
 import '../../utils/no_data_place_holder.dart';
 import '../../utils/snackbar_helper.dart';
 import '../../widgets/icon_button.dart';
 import 'widgets/add_edit_category_form.dart';
-
 
 class Categories extends StatefulWidget {
   const Categories({super.key});
@@ -19,7 +19,7 @@ class Categories extends StatefulWidget {
 }
 
 class _CategoriesState extends State<Categories> {
-  final CategoryService _categoryService = CategoryService();
+  final ApiService _apiService = ApiService();
 
   List<Category> _categories = [];
   bool _isLoading = true;
@@ -36,13 +36,25 @@ class _CategoriesState extends State<Categories> {
   Future<void> _fetchCategories() async {
     setState(() => _isLoading = true);
     try {
-      _categories = await _categoryService.fetchCategories();
+      final categories = await _apiService.get<List<Category>>(
+        '/Category',
+        context: context,
+        fromJson: (data) {
+          final List items = data['data'];
+          return items.map((e) => CategoryDTO.fromJson(e)).toList();
+        },
+      );
+
+      if (categories != null) {
+        setState(() {
+          _categories = categories;
+        });
+      }
     } catch (_) {
       SnackbarHelper.error('Failed to fetch categories');
     } finally {
       setState(() => _isLoading = false);
     }
-    
   }
 
   void _deleteCategory(int id) async {
@@ -57,9 +69,16 @@ class _CategoriesState extends State<Categories> {
     if (confirm != true) return;
 
     try {
-      await _categoryService.deleteCategory(id);
-      SnackbarHelper.success('Category deleted');
-      await _fetchCategories();
+      final success = await _apiService.delete<bool>(
+        '/Category/$id',
+        context: context,
+        fromJson: (data) => data['success'] == true,
+      );
+
+      if (success == true) {
+        SnackbarHelper.success('Category deleted');
+        await _fetchCategories();
+      }
     } on DioException catch (e) {
       final message = e.response?.data['message'] ?? 'Delete failed';
 
@@ -75,6 +94,7 @@ class _CategoriesState extends State<Categories> {
     }
   }
 
+
   void _startEdit(Category cat) {
     print('Editing category: ${cat.name}');
     setState(() {
@@ -83,104 +103,114 @@ class _CategoriesState extends State<Categories> {
       _showAddForm = true;
     });
   }
-
   @override
-  Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
-    }
-    if (_categories.isEmpty) {
-      return const NoDataPlaceholder(
-        title: 'No category in Inventory',
-        message: 'Start by adding some category using the “Manage” tab',
-        icon: LucideIcons.box, 
-      );
-    }
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(color: AppColors.textFieldBorder, width: 1.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(LucideIcons.folder, size: 24, color: AppColors.buttonDark),
-                  const SizedBox(width: 8.0),
-                  Text('Categories', style: AppTextStyles.titleStyle),
-                ],
-              ),
-              if (!_showAddForm)
-                ActionIconButton(
-                  label: 'Add Category',
-                  icon: LucideIcons.plus,
-                  backgroundColor: AppColors.buttonDark,
-                  onPressed: () => setState(() => _showAddForm = true),
-                  height: 45.0,
-                  width: 140.0,
-                ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          if (_showAddForm)
-            AddCategoryForm(
-              isEdit: _isEditMode,
-              initialName: _editingCategory?.name,
-              initialDescription: _editingCategory?.description,
-              onSubmit: (name, desc) async {
-                try {
-                  if (_isEditMode && _editingCategory != null) {
-                    await _categoryService.updateCategory(_editingCategory!.id, name, desc);
-                    SnackbarHelper.success('Category updated !');
-                  } else {
-                    await _categoryService.createCategory(name, desc);
-                    SnackbarHelper.success('Category created !');
-                  }
-                  setState(() {
-                    _showAddForm = false;
-                    _isEditMode = false;
-                    _editingCategory = null;
-                  });
-                  await _fetchCategories();
-                } catch (e, stack) {
-                  print('Edit error: $e');
-                  print(stack);
-                  SnackbarHelper.error('Operation failed');
-                }
-              },
-              onCancel: () => setState(() {
-                _showAddForm = false;
-                _editingCategory = null;
-                _isEditMode = false;
-              }),
-            ),
-          const SizedBox(height: 16),
-          if (_isLoading)
-            const Center(child: CircularProgressIndicator())
-          else if (_categories.isEmpty)
-            const Text('No categories found.')
-          else
-            ..._categories.map((cat) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: _CategoryCard(
-                    categoryName: cat.name,
-                    description: cat.description ,
-                    creationDate: cat.createdAt,
-                    createdBy: 'Admin',
-                    onEdit: () => _startEdit(cat),
-                    onDelete: () => _deleteCategory(cat.id),
-                  ),
-                )),
-        ],
-      ),
-    );
+Widget build(BuildContext context) {
+  if (_isLoading) {
+    return const Center(child: CircularProgressIndicator());
   }
+
+  return Container(
+    padding: const EdgeInsets.all(16.0),
+    decoration: BoxDecoration(
+      color: AppColors.cardBackground,
+      borderRadius: BorderRadius.circular(10.0),
+      border: Border.all(color: AppColors.textFieldBorder, width: 1.0),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(LucideIcons.folder, size: 24, color: AppColors.buttonDark),
+                const SizedBox(width: 8.0),
+                Text('Categories', style: AppTextStyles.titleStyle),
+              ],
+            ),
+            if (!_showAddForm)
+              ActionIconButton(
+                label: 'Add Category',
+                icon: LucideIcons.plus,
+                backgroundColor: AppColors.buttonDark,
+                onPressed: () => setState(() => _showAddForm = true),
+                height: 45.0,
+                width: 140.0,
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+
+        if (_showAddForm)
+          AddCategoryForm(
+            isEdit: _isEditMode,
+            initialName: _editingCategory?.name,
+            initialDescription: _editingCategory?.description,
+            onSubmit: (name, desc) async {
+              try {
+                if (_isEditMode && _editingCategory != null) {
+                  await _apiService.put(
+                    '/Category/${_editingCategory!.id}',
+                    {
+                      'name': name,
+                      'description': desc,
+                    },
+                    context: context,
+                  );
+                  SnackbarHelper.success('Category updated!');
+                } else {
+                  await _apiService.post(
+                    '/Category',
+                    {
+                      'name': name,
+                      'description': desc,
+                    },
+                    context: context,
+                  );
+                  SnackbarHelper.success('Category created!');
+                }
+                setState(() {
+                  _showAddForm = false;
+                  _isEditMode = false;
+                  _editingCategory = null;
+                });
+                await _fetchCategories();
+              } catch (e) {
+                SnackbarHelper.error('Operation failed');
+              }
+            },
+            onCancel: () => setState(() {
+              _showAddForm = false;
+              _editingCategory = null;
+              _isEditMode = false;
+            }),
+          ),
+
+        const SizedBox(height: 16),
+
+        if (_categories.isEmpty)
+          const NoDataPlaceholder(
+            title: 'No category in Inventory',
+            message: 'Start by adding some new category.',
+            icon: LucideIcons.box,
+          )
+        else
+          ..._categories.map((cat) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: _CategoryCard(
+                  categoryName: cat.name,
+                  description: cat.description,
+                  creationDate: cat.createdAt,
+                  createdBy: cat.userName ?? 'Unknown',
+                  onEdit: () => _startEdit(cat),
+                  onDelete: () => _deleteCategory(cat.id),
+                ),
+              )),
+      ],
+    ),
+  );
+}
 }
 
 class _CategoryCard extends StatelessWidget {
@@ -217,7 +247,15 @@ class _CategoryCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(categoryName, style: AppTextStyles.titleStyle),
+                Expanded(
+                  child: Text(
+                    categoryName, 
+                    style: AppTextStyles.titleStyle,
+                    overflow: TextOverflow.visible,
+                    softWrap: true,
+                    maxLines: 2,
+                  )
+                ),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_inventory_management/utils/snackbar_helper.dart';
 import '../../DTO/product_item_detail_dto.dart';
-import '../../services/product_service.dart';
+import '../../services/api_service.dart';
 import '../../theme/theme.dart';
 import '../../utils/date_formatter.dart';
 import '../../utils/no_data_place_holder.dart';
@@ -39,17 +39,25 @@ class _ProductItemDetailsState extends State<ProductItemDetails> {
       _fetchProductItems(); // Fetch new data
     }
   }
+
   Future<void> _fetchProductItems() async {
     try {
-      final items = await ProductService().getItemsByProduct(widget.productId);
+      final response = await ApiService().get<List<ProductItemDetailDTO>>(
+        '/ProductItem/by-product/${widget.productId}',
+        context: context,
+        fromJson: (data) {
+          final List items = data['data'];
+          return items.map((e) => ProductItemDetailDTO.fromJson(e)).toList();
+        },
+      );
 
-      // Sort items by addedDate descending
-      items.sort((a, b) => b.addedDate.compareTo(a.addedDate));
-      
-      setState(() {
-        _items = items;
-        _isLoading = false;
-      });
+      if (response != null) {
+        response.sort((a, b) => b.addedDate.compareTo(a.addedDate));
+        setState(() {
+          _items = response;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       SnackbarHelper.error('Failed to load product items.');
       setState(() {
@@ -57,6 +65,7 @@ class _ProductItemDetailsState extends State<ProductItemDetails> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return Center(child: CircularProgressIndicator());
@@ -94,8 +103,7 @@ class _ProductItemDetailsState extends State<ProductItemDetails> {
             padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Row(
               children: [
-                _buildHeaderRow(context, 'Item Details - ${firstItem.productName}',
-                ),
+                _buildHeaderRow(context, firstItem.productName),
               ],
             ),
           ),
@@ -205,7 +213,7 @@ class _ProductItemCard extends StatelessWidget {
                   const SizedBox(height: 10.0),
                   Row(
                     children: [
-                      const Icon(LucideIcons.hash, size: 16.0, color: AppColors.purpleIcon),
+                      const Icon(LucideIcons.hash, size: 16.0, color: AppColors.darkBlue),
                       const SizedBox(width: 4.0),
                       Text(
                         'Serial-Number: ${item.serialNumber}',
@@ -216,7 +224,7 @@ class _ProductItemCard extends StatelessWidget {
                   const SizedBox(height: 4.0),
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 16.0, color: AppColors.darkBlue),
+                      const Icon(Icons.calendar_today, size: 16.0, color: AppColors.purpleIcon),
                       const SizedBox(width: 4.0),
                       Text(
                         'Added: ${_formatDate(item.addedDate)}',
@@ -226,7 +234,7 @@ class _ProductItemCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      const Icon(Icons.person_outline, size: 16.0, color: AppColors.greenIcon),
+                      const Icon(LucideIcons.user2, size: 16.0, color: AppColors.textBlack),
                       const SizedBox(width: 4.0),
                       Text(
                         'By: ${item.userName}',

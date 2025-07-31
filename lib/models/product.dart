@@ -8,6 +8,7 @@ class Product {
   final double sellingPrice;
   final int categoryId;
   final CategoryDropdown category;
+  final String? userName;
 
   Product({
     required this.id,
@@ -17,6 +18,7 @@ class Product {
     required this.sellingPrice,
     required this.categoryId,
     required this.category,
+    this.userName
   });
 
 }

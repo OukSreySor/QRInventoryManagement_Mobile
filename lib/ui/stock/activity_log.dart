@@ -3,9 +3,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../models/activity_log_entry.dart';
 import '../../services/dio_client.dart';
 import '../../theme/theme.dart';
-
-
 import '../../utils/date_formatter.dart';
+import '../../utils/no_data_place_holder.dart';
 
 class ActivityLog extends StatefulWidget {
 
@@ -58,7 +57,11 @@ class _ActivityLogState extends State<ActivityLog> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No activity log entries found.'));
+          return NoDataPlaceholder(
+            icon: LucideIcons.xSquare,
+            title: 'No activity log entries found.',
+            message: 'Add new transactions to the inventory.',
+          );
         }
 
         final List<ActivityLogEntry> entries = snapshot.data!;
@@ -103,7 +106,7 @@ class _ActivityLogState extends State<ActivityLog> {
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 4.0, bottom: 16.0, left: 16.0, right: 16.0 ),
+                        padding: const EdgeInsets.only(top: 4.0, bottom: 8.0, left: 8.0, right: 8.0 ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -117,12 +120,13 @@ class _ActivityLogState extends State<ActivityLog> {
                                           ? LucideIcons.trendingDown
                                           : LucideIcons.trendingUp, 
                                       color: _getStockColor(entry.transactionType), 
+                                      size: 20,
                                     ),
-                                    const SizedBox(width: 8.0),
+                                    const SizedBox(width: 4.0),
                                     Text(
                                       entry.itemName,
                                       style: const TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black, 
                                       ),
@@ -135,13 +139,13 @@ class _ActivityLogState extends State<ActivityLog> {
                                     Text(
                                       entry.transactionType == 'StockOut' ? '-1' : '+1',
                                       style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: 17,
                                           fontWeight: FontWeight.bold,
                                           color: _getStockColor(entry.transactionType)), 
                                     ),
                                     Text(
                                       'units',
-                                      style: TextStyle(fontSize: 12, color: AppColors.textMedium),
+                                      style: TextStyle(fontSize: 11, color: AppColors.textMedium),
                                     ),
                                   ],
                                 ),
@@ -157,7 +161,7 @@ class _ActivityLogState extends State<ActivityLog> {
                                 entry.transactionType,
                                 style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     fontWeight: FontWeight.w600), 
                               ),
                             ),
@@ -165,25 +169,25 @@ class _ActivityLogState extends State<ActivityLog> {
                     
                             Row(
                               children: [
-                                Icon(LucideIcons.hash, size: 16, color: AppColors.primaryBlue), 
+                                Icon(LucideIcons.hash, size: 15, color: AppColors.primaryBlue), 
                                 const SizedBox(width: 8.0),
-                                Text(entry.serialNumber, style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)),
+                                Text(entry.serialNumber, style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
                               ],
                             ),
                             const SizedBox(height: 8.0),
                             Row(
                               children: [
-                                Icon(LucideIcons.user2, size: 16, color: AppColors.textBlack),
+                                Icon(LucideIcons.user2, size: 15, color: AppColors.textBlack),
                                 const SizedBox(width: 8.0),
-                                Text(entry.userName, style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)),
+                                Text(entry.userName, style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
                               ],
                             ),
                             const SizedBox(height: 8.0),
                             Row(
                               children: [
-                                Icon(LucideIcons.calendar, size: 16, color: AppColors.purpleIcon),
+                                Icon(LucideIcons.calendar, size: 15, color: AppColors.purpleIcon),
                                 const SizedBox(width: 8.0),
-                                Text(formattedDate, style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)), 
+                                Text(formattedDate, style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)), 
                               ],
                             ),
                             Divider(height: 24.0, thickness: 1.0, color: AppColors.textFieldBorder),
@@ -192,11 +196,11 @@ class _ActivityLogState extends State<ActivityLog> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Text('Transaction Value:',
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)), 
+                                    style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold, color: Colors.black)), 
                                 Text(
                                   '\$${entry.transactionValue.toStringAsFixed(2)}', 
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.darkBlue),
+                                      fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.darkBlue),
                                 ),
                               ],
                             ),

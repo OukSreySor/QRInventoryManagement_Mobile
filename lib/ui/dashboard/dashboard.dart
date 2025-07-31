@@ -2,20 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_inventory_management/controllers/auth_controller.dart';
-import 'package:qr_inventory_management/services/inventory_service.dart';
+import 'package:qr_inventory_management/services/api_service.dart';
 import 'package:qr_inventory_management/ui/dashboard/widgets/low_stock_alert.dart';
 import 'package:qr_inventory_management/ui/dashboard/widgets/stock_trend_line_chart.dart';
 import 'package:qr_inventory_management/ui/dashboard/widgets/top_sale_product.dart';
 import 'package:qr_inventory_management/ui/manage/categories.dart';
 import 'package:qr_inventory_management/ui/manage/products_management.dart';
 import 'package:qr_inventory_management/ui/manage/inventory_report.dart';
+import 'package:qr_inventory_management/ui/qrcode/batch_qr_code_generator.dart';
 import 'package:qr_inventory_management/ui/stock/product_stock_summary.dart';
 import 'package:qr_inventory_management/ui/stock/stock_in.dart';
 import 'package:qr_inventory_management/ui/stock/stock_out.dart';
-import 'package:qr_inventory_management/utils/no_data_place_holder.dart';
 import '../../models/report.dart';
 import '../../models/user.dart';
-import '../../services/dio_client.dart';
 import '../../theme/theme.dart';
 import '../../widgets/dashboard_header.dart';
 import '../../widgets/navigation_tabs.dart';
@@ -42,7 +41,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final _inventoryService = InventoryService();
+  final _apiService = ApiService();
 
   final AuthController authController = Get.find<AuthController>();
 
@@ -87,34 +86,47 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _fetchDashboardSummary() async {
-    try {
-      final summary = await _inventoryService.fetchInventoryReport(); 
+  try {
+    final response = await _apiService.get<Map<String, dynamic>>(
+      '/Transaction/summary',
+      context: context,
+      fromJson: (json) => json,
+    );
+
+    if (response != null && response['success'] == true) {
+      final summary = Report.fromJson(response);
       setState(() {
         _dashboardSummary = summary;
       });
-    } catch (e) {
-      print("Error loading dashboard summary: $e");
-    }
-  }
-
-  Future<void> _fetchDailyStockCount() async {
-  try {
-    final response = await DioClient.dio.get('/Transaction/counts');
-    if (response.statusCode == 200 && response.data['success']) {
-      setState(() {
-        _stockCount = StockCount(
-          stockInCount: response.data['stockInCount'],
-          stockOutCount: response.data['stockOutCount'],
-        );
-        print("Fetched StockIn: ${response.data['StockInCount']}, StockOut: ${response.data['StockOutCount']}");
-
-      });
+    } else {
+      throw Exception('API returned invalid data or failure');
     }
   } catch (e) {
-    print("Error fetching daily counts: $e");
+    print("Error loading dashboard summary: $e");
   }
 }
 
+
+  Future<void> _fetchDailyStockCount() async {
+    try {
+      final response = await _apiService.get<Map<String, dynamic>>(
+        '/Transaction/counts',
+        context: context,
+        fromJson: (data) => data,
+      );
+
+      if (response?['success'] == true) {
+        setState(() {
+          _stockCount = StockCount(
+            stockInCount: response?['stockInCount'],
+            stockOutCount: response?['stockOutCount'],
+          );
+        });
+      }
+    } catch (e) {
+      print("Error fetching daily counts: $e");
+    }
+  }
 
   String _roleDisplayName(String role) {
     switch (role.toLowerCase()) {
@@ -349,12 +361,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
     if (_mainTabIndex == 2) {
-      return const Center(
-        child: NoDataPlaceholder(
-          icon: LucideIcons.qrCode,
-          title: 'This section not available yet.',
-          message: 'To add some product items to generate QR batch',
-        )
+      return Center(
+        child: BatchQrCodeGenerator()
       );
     }
 

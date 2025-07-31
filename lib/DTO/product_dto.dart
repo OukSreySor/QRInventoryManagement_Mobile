@@ -18,6 +18,7 @@ class ProductDTO {
       sellingPrice: (json['selling_Price']),
       categoryId: json['categoryId'],
       category: CategoryDropdown.fromJson(json['category']),
+      userName: json['userName']
     );
   }
 

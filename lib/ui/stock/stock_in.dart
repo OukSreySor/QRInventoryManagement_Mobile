@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -114,13 +115,16 @@ class _StockInSectionState extends State<StockInSection> {
       manufacturingDate: manufacturingDate,
       expiryDate: expiryDate,
       addedDate: addedDate,
+      
     );
-
+    print('AddedDate sent: ${dto.addedDate.toIso8601String()}');
     print("Selected Product: ${_selectedProduct!.name} (ID: ${_selectedProduct!.id})");
     print("Serial: ${dto.serialNumber}");
     print("MFG: ${dto.manufacturingDate}");
     print("EXP: ${dto.expiryDate}");
-
+    print('About to POST /ProductItem/create-stockin with:');
+    print(dto.toJson());
+    
     final response = await DioClient.dio.post(
       '/ProductItem/create-stockin',
       data: dto.toJson(),
@@ -129,7 +133,6 @@ class _StockInSectionState extends State<StockInSection> {
     if (response.statusCode == 200 && response.data['success'] == true) {
       final qrImageUrl = response.data['data']['qrImageUrl'];
       final qrString = response.data['data']['qR_Code'];
-      print('QR Image URL: $qrImageUrl');
 
       setState(() {
         _qrImageUrl = qrImageUrl;
@@ -142,11 +145,17 @@ class _StockInSectionState extends State<StockInSection> {
         _selectedProduct = null;
       });
       SnackbarHelper.success('Stock-in successful!');
-    }
+    } 
+  } on DioException catch(e) {
+    final statusCode = e.response?.statusCode;
+    final responseData = e.response?.data;
+    print('Dio error [$statusCode]: $responseData');
+
+    SnackbarHelper.error(responseData?['message'] ?? 'Failed to stock in.');
   } catch (e) {
+
     SnackbarHelper.error('Failed to stock in. Check input and try again.');
   }
-
 }
 
   @override
@@ -296,7 +305,7 @@ class _StockInSectionState extends State<StockInSection> {
       ), 
       const SizedBox(height: 8.0),
       Container(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
           color: Color(0xFFF0FDF4),
           borderRadius: BorderRadius.circular(12.0),
@@ -306,10 +315,10 @@ class _StockInSectionState extends State<StockInSection> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 64),
-            const SizedBox(height: 16.0),
-            const Text("QR Code Generated!", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16.0),
+            const Icon(Icons.check_circle, color: Colors.green, size: 56),
+            const SizedBox(height: 8.0),
+            const Text("QR Code Generated!", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8.0),
             if (_qrImageUrl != null)
               Container(
                 padding: const EdgeInsets.all(16.0),
@@ -322,13 +331,13 @@ class _StockInSectionState extends State<StockInSection> {
                     Image.network(_qrImageUrl!, width: 200.0, height: 200.0),
                     const SizedBox(height: 12),
                     if (_qrString != null)
-                      Text(_qrString!, style: const TextStyle(fontSize: 16.0, color: Colors.black, fontWeight: FontWeight.w600)),
+                      Text(_qrString!, style: const TextStyle(fontSize: 15.0, color: Colors.black, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
-            const SizedBox(height: 20.0),
+            const SizedBox(height: 16.0),
             const Text("Save or print this QR code to attach to your item", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16.0),
             PrimaryButton(
               text: 'Add another Item',
               onPressed: () {

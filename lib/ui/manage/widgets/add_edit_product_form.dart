@@ -3,8 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_inventory_management/models/category_dropdown.dart';
 import '../../../DTO/create_product_dto.dart';
 import '../../../models/product.dart';
-import '../../../services/dio_client.dart';
-import '../../../services/product_service.dart';
+import '../../../services/api_service.dart';
 import '../../../theme/theme.dart';
 import '../../../utils/snackbar_helper.dart';
 import '../../../widgets/custom_text_feild.dart';
@@ -24,7 +23,7 @@ class AddEditProductForm extends StatefulWidget {
 
 class _AddEditProductFormState extends State<AddEditProductForm> {
   final _formKey = GlobalKey<FormState>();
-  final ProductService _productService = ProductService();
+  final ApiService _apiService = ApiService();
 
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _unitPriceController = TextEditingController();
@@ -52,32 +51,33 @@ class _AddEditProductFormState extends State<AddEditProductForm> {
   }
 
   Future<void> _fetchCategoryNames() async {
-    try {
-      final response = await DioClient.dio.get('/Category/names');
+  try {
+    final categories = await _apiService.get<List<CategoryDropdown>>(
+      '/Category/names',
+      context: context,
+      fromJson: (data) {
+        final List items = data['data'];
+        return items.map((e) => CategoryDropdown.fromJson(e)).toList();
+      },
+    );
 
-      if (response.statusCode == 200) {
-        final List data = response.data['data'];
-        final categories =
-            data.map((item) => CategoryDropdown.fromJson(item)).toList();
+    if (categories != null) {
+      setState(() {
+        _categories = categories;
 
-        setState(() {
-          _categories = categories;
-
-          if (widget.isEdit && widget.initialProduct != null) {
-            _selectedCategoryId = widget.initialProduct!.categoryId;
-            _selectedCategory = _categories.firstWhere(
-              (cat) => cat.id == _selectedCategoryId,
-            );
-          }
-        });
-        
-      } else {
-        print('Error: ${response.statusCode} ${response.statusMessage}');
-      }
-    } catch (e) {
-      print('Failed to load category names: $e');
+        if (widget.isEdit && widget.initialProduct != null) {
+          _selectedCategoryId = widget.initialProduct!.categoryId;
+          _selectedCategory = _categories.firstWhere(
+            (cat) => cat.id == _selectedCategoryId,
+          );
+        }
+      });
     }
+  } catch (e) {
+    print('Failed to load category names: $e');
   }
+}
+
 
   @override
   void dispose() {
@@ -105,21 +105,27 @@ class _AddEditProductFormState extends State<AddEditProductForm> {
 
   try {
     if (widget.isEdit && widget.initialProduct != null) {
-        await _productService.updateProduct(widget.initialProduct!.id, dto, context);
-        SnackbarHelper.success('Product updated successfully');
+      await _apiService.put(
+        '/Product/${widget.initialProduct!.id}',
+        dto.toJson(),
+        context: context,
+      );
+      SnackbarHelper.success('Product updated successfully');
+    } else {
+      await _apiService.post(
+        '/Product',
+        dto.toJson(),
+        context: context,
+      );
+      SnackbarHelper.success('Product created successfully');
+    }
 
-      } else {
-        await _productService.createProduct(dto, context);
-        SnackbarHelper.success('Product created successfully');
-      }
-
-      widget.onSubmit(); 
-    } catch (e) {
-      print('Updating product ID: ${widget.initialProduct?.id}');
-      SnackbarHelper.error(widget.isEdit
-          ? 'Failed to update product'
-          : 'Failed to add product');
-    } 
+    widget.onSubmit();
+  } catch (e) {
+    SnackbarHelper.error(widget.isEdit
+        ? 'Failed to update product'
+        : 'Failed to add product');
+    }
   }
 
   
@@ -205,7 +211,7 @@ class _AddEditProductFormState extends State<AddEditProductForm> {
             ),
             const SizedBox(height: 16.0),
             CustomTextField(
-              label: 'Description (Optional)',
+              label: 'Description',
               hintText: 'Product specs, materials, etc.',
               controller: _descriptionController,
               maxLines: 3,

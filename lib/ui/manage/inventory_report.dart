@@ -86,6 +86,8 @@ class _InventoryReportsScreenState extends State<InventoryReportsScreen> {
     return 
     Column(
       children: [
+        _buildHeaderCard(),
+        const SizedBox(height: 8),
         // Date filter row
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -160,7 +162,6 @@ class _InventoryReportsScreenState extends State<InventoryReportsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 4.0),
-                _buildHeaderCard(),
                 InfoCardGrid(cards: cards),
                 const SizedBox(height: 8.0),
                 _buildStockMovement(report),

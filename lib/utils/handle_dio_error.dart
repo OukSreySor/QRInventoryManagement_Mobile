@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
 import 'snackbar_helper.dart';
+
 void handleDioError(DioException error, BuildContext context) {
   String errorMessage = 'An unexpected error occurred.';
 

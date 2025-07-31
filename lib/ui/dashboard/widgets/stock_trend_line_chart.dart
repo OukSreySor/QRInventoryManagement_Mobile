@@ -30,7 +30,6 @@ class _StockTrendLineChartState extends State<StockTrendLineChart> {
 
     return trends.map((json) => StockTrend.fromJson(json)).toList();
   } catch (e) {
-    print('Error fetching trends: $e');
     throw Exception('Failed to load trends');
   }
 }
@@ -50,11 +49,7 @@ class _StockTrendLineChartState extends State<StockTrendLineChart> {
         }
 
         final trends = snapshot.data!;
-        print('Fetched Trends:');
-        for (var trend in trends) {
-          print('Date: ${trend.date}, StockIn: ${trend.stockIn}, StockOut: ${trend.stockOut}');
-        }
-
+        
       return Column(
         children: [
           const Padding(
@@ -96,7 +91,7 @@ class _StockTrendLineChartState extends State<StockTrendLineChart> {
                       ),
                       sideTitles: SideTitles(
                         showTitles: true,
-                        interval: 1, // Control spacing, e.g., every 1 units
+                        interval: 2, // Control spacing, e.g., every 1 units
                         getTitlesWidget: (value, meta) {
                           return Text(
                             value.toInt().toString(),
