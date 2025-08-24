@@ -1,3 +1,4 @@
+
 class ProductItemDetailDTO {
   final int id;
   final String serialNumber;
@@ -10,7 +11,7 @@ class ProductItemDetailDTO {
   final String productName;
   final String userName;
   final DateTime addedDate;
-  final String status;
+  String status;
 
   ProductItemDetailDTO({
     required this.id,

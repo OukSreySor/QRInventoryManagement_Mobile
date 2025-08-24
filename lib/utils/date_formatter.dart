@@ -13,7 +13,7 @@ class DateFormatter {
 
   // "07/29/2025 14:30"
   static String formatDateTimeShort(DateTime date) {
-    return DateFormat('MM/dd/yyyy HH:mm').format(date);
+    return DateFormat('MM/dd/yyyy HH:mm a').format(date);
   }
 
   // "July 29, 2025 2:30 PM"

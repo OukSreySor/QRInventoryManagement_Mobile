@@ -1,5 +1,7 @@
 import 'package:qr_inventory_management/models/category_dropdown.dart';
 
+import 'enums/product_status.dart';
+
 class Product {
   final int id;
   final String name;
@@ -9,6 +11,7 @@ class Product {
   final int categoryId;
   final CategoryDropdown category;
   final String? userName;
+  final ProductStatus? status;
 
   Product({
     required this.id,
@@ -18,7 +21,9 @@ class Product {
     required this.sellingPrice,
     required this.categoryId,
     required this.category,
-    this.userName
+    this.userName,
+    this.status
+
   });
 
 }

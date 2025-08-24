@@ -6,6 +6,7 @@ import 'package:qr_inventory_management/storage/token_storage.dart';
 import 'package:qr_inventory_management/ui/auth/auth_screen.dart';
 import 'package:qr_inventory_management/ui/dashboard/dashboard.dart';
 import 'package:qr_inventory_management/ui/welcome_screen.dart';
+import 'storage/user_storage.dart';
 import 'theme/theme.dart';
 
 void main() async {
@@ -13,11 +14,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
  
-  final String? token = TokenStorage.getToken();
-
+  final accessToken = TokenStorage.getAccessToken();
+  final refreshToken = TokenStorage.getRefreshToken();
+  final savedUserJson = UserStorage.getUser();
+  
   String initialRoute = '/welcome'; 
-  if (token != null && token.isNotEmpty) {
-    initialRoute = '/dashboard'; 
+
+  if (accessToken != null &&
+      accessToken.isNotEmpty &&
+      refreshToken != null &&
+      refreshToken.isNotEmpty  &&
+      savedUserJson != null) {
+    initialRoute = '/dashboard';
   }
 
   runApp(MyApp(initialRoute: initialRoute));

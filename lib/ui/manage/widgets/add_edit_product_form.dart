@@ -211,7 +211,7 @@ class _AddEditProductFormState extends State<AddEditProductForm> {
             ),
             const SizedBox(height: 16.0),
             CustomTextField(
-              label: 'Description',
+              label: 'Description (optional)',
               hintText: 'Product specs, materials, etc.',
               controller: _descriptionController,
               maxLines: 3,

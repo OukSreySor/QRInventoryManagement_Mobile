@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_inventory_management/utils/snackbar_helper.dart';
 import '../../DTO/product_dto.dart';
+import '../../models/enums/product_status.dart';
 import '../../models/product.dart';
 import '../../services/api_service.dart';
 import '../../theme/theme.dart';
@@ -35,29 +36,28 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
   }
 
   Future<void> _loadProducts() async {
-  setState(() => _isLoading = true);
-  try {
-    final products = await _apiService.get<List<Product>>(
-      '/Product',
-      context: context,
-      fromJson: (data) {
-        final List items = data['data'];
-        return items.map((e) => ProductDTO.fromJson(e)).toList();
-      },
-    );
+    setState(() => _isLoading = true);
+    try {
+      final products = await _apiService.get<List<Product>>(
+        '/Product',
+        context: context,
+        fromJson: (data) {
+          final List items = data['data'];
+          return items.map((e) => ProductDTO.fromJson(e)).toList();
+        },
+      );
 
-    if (products != null) {
-      setState(() {
-        _products = products;
-      });
+      if (products != null) {
+        setState(() {
+          _products = products;
+        });
+      }
+    } catch (e) {
+      SnackbarHelper.error('Failed to fetch products');
+    } finally {
+      setState(() => _isLoading = false);
     }
-  } catch (e) {
-    SnackbarHelper.error('Failed to fetch products');
-  } finally {
-    setState(() => _isLoading = false);
   }
-}
-
 
   void _startAddProduct() {
     setState(() {
@@ -84,31 +84,44 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
   }
 
   Future<void> _deleteProduct(int productId) async {
-    final confirmed = await showConfirmDialog(
+  final confirmed = await showConfirmDialog(
+    context: context,
+    title: 'Confirm Delete',
+    content: 'Are you sure you want to delete this product?',
+    confirmText: 'Yes',
+    cancelText: 'No',
+    confirmColor: AppColors.pinkRedIcon,
+  );
+
+  if (confirmed != true) return;
+
+  try {
+    final result = await _apiService.delete<Map<String, dynamic>>(
+      '/Product/$productId',
       context: context,
-      title: 'Confirm Delete', 
-      content: 'Are you sure you want to delete this product?',
-      confirmText: 'Yes',
-      cancelText: 'No',
-      confirmColor: AppColors.pinkRedIcon,
+      fromJson: (data) => data,
     );
 
-    if (confirmed != true) return;
+    if (result != null && result['success'] == true) {
+      final message = result['message']?.toString().toLowerCase() ?? '';
 
-    try {
-      final deleted = await _apiService.delete<bool>(
-        '/Product/$productId',
-        context: context,
-        fromJson: (data) => data['success'] == true,
-      );
-      if (deleted == true) {
-        SnackbarHelper.success('Product deleted');
-        await _loadProducts();
+      if (message.contains('permanently deleted')) {
+        SnackbarHelper.success('Product has been permanently deleted.');
+      } else if (message.contains('discontinued')) {
+        SnackbarHelper.warning('Product contains items and was marked as discontinued.');
+      } else {
+        SnackbarHelper.success(result['message'] ?? 'Product deleted.');
       }
-    } catch (_) {
-      SnackbarHelper.error('Failed to delete product');
+
+      await _loadProducts();
+    } else {
+      SnackbarHelper.error(result?['message'] ?? 'Failed to delete product.');
     }
+  } catch (_) {
+    SnackbarHelper.error('Failed to delete product.');
   }
+}
+
 
   Future<void> _handleFormSubmit() async {
     _cancelForm();
@@ -187,6 +200,7 @@ Widget build(BuildContext context) {
               createdBy: pro.userName ?? 'Unknown',
               onEdit: () => _startEditProduct(pro),
               onDelete: () => _deleteProduct(pro.id),
+              status: pro.status!,
             ),
           ),
         ),
@@ -205,6 +219,7 @@ class _ProductCard extends StatelessWidget {
   final String createdBy;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final ProductStatus status;
 
   const _ProductCard({
     required this.productName,
@@ -214,88 +229,120 @@ class _ProductCard extends StatelessWidget {
     required this.price,
     required this.createdBy,
     required this.onEdit,
-    required this.onDelete,
+    required this.onDelete, 
+    required this.status,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: AppColors.cardBackground,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(width: 1.0, color: AppColors.textFieldBorder),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    productName, 
-                    style: AppTextStyles.titleStyle,
-                    overflow: TextOverflow.visible,
-                    softWrap: true,
-                    maxLines: 2,
-                  ),
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+    final isDiscontinued = status == ProductStatus.discontinued;
+   
+    return Stack(
+      children: [
+          Opacity(
+          opacity: isDiscontinued ? 0.5 : 1.0,
+          child: IgnorePointer(
+            ignoring: isDiscontinued,
+            child: Card(
+              elevation: 0,
+              color: isDiscontinued ? Colors.grey.shade200 : AppColors.cardBackground,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                side: BorderSide(width: 1.0, color: isDiscontinued ? Colors.grey.shade400 : AppColors.textFieldBorder,),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      height: 35.0,
-                      width: 35.0,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(6.0),
-                        border: Border.all(color: AppColors.textFieldBorder),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(LucideIcons.edit, color: AppColors.buttonDark, size: 20),
-                        onPressed: onEdit,
-                        tooltip: 'Edit',
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            productName, 
+                            style: AppTextStyles.titleStyle,
+                            overflow: TextOverflow.visible,
+                            softWrap: true,
+                            maxLines: 2,
+                          ),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              height: 35.0,
+                              width: 35.0,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(6.0),
+                                border: Border.all(color: AppColors.textFieldBorder),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(LucideIcons.edit, color: AppColors.buttonDark, size: 20),
+                                onPressed: onEdit,
+                                tooltip: 'Edit',
+                              ),
+                            ),
+                            const SizedBox(width: 4.0),
+                            Container(
+                              height: 35.0,
+                              width: 35.0,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(6.0),
+                                border: Border.all(color: AppColors.textFieldBorder),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(LucideIcons.trash2, color: AppColors.buttonDark, size: 20),
+                                onPressed: onDelete,
+                                tooltip: 'Delete',
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                      ],
                     ),
-                    const SizedBox(width: 4.0),
-                    Container(
-                      height: 35.0,
-                      width: 35.0,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(6.0),
-                        border: Border.all(color: AppColors.textFieldBorder),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(LucideIcons.trash2, color: AppColors.buttonDark, size: 20),
-                        onPressed: onDelete,
-                        tooltip: 'Delete',
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(category, style: AppTextStyles.labelStyle.copyWith(color: AppColors.primaryBlue)),
+                        
+                      ],
                     ),
+                    const SizedBox(height: 4.0),
+                    Text(description, style: AppTextStyles.labelStyle),
+                    const SizedBox(height: 8.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Buy: \$${cost.toStringAsFixed(2)}', style: AppTextStyles.subtitle.copyWith(color: AppColors.pinkRedIcon)),
+                        Text('Sold: \$${price.toStringAsFixed(2)}', style: AppTextStyles.subtitle.copyWith(color: AppColors.greenIcon)),
+                      ],
+                    ),
+                    const SizedBox(height: 12.0),
+                    Text('Created by $createdBy', style: AppTextStyles.textFieldLabel.copyWith(color: AppColors.textLight)),
                   ],
                 ),
-                
-              ],
+              ),
             ),
-            Text(category, style: AppTextStyles.labelStyle.copyWith(color: AppColors.primaryBlue)),
-            const SizedBox(height: 4.0),
-            Text(description, style: AppTextStyles.labelStyle),
-            const SizedBox(height: 8.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Buy: \$${cost.toStringAsFixed(2)}', style: AppTextStyles.subtitle.copyWith(color: AppColors.pinkRedIcon)),
-                Text('Sold: \$${price.toStringAsFixed(2)}', style: AppTextStyles.subtitle.copyWith(color: AppColors.greenIcon)),
-              ],
-            ),
-            const SizedBox(height: 12.0),
-            Text('Created by $createdBy', style: AppTextStyles.textFieldLabel.copyWith(color: AppColors.textLight)),
-          ],
+            
+          ),
         ),
-      ),
+        if (isDiscontinued)
+            Positioned(
+              top: 12,
+              right: 12,
+              child: Chip(
+                label: const Text("Discontinued"),
+                backgroundColor: Colors.red.shade100,
+                labelStyle: const TextStyle(color: Colors.red),
+              ),
+            ),
+      ]
     );
   }
 }
+
+

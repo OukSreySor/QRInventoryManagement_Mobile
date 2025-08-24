@@ -40,6 +40,17 @@ class _AuthScreenState extends State<AuthScreen> {
   void initState() {
     super.initState();
     _authTabIndex = widget.initialTabIndex;
+
+    ever(authController.isLoading, (loading) {
+      if (loading == true && !(Get.isDialogOpen ?? false)) {
+        Get.dialog(
+          const Center(child: CircularProgressIndicator()),
+          barrierDismissible: false,
+        );
+      } else {
+        if (Get.isDialogOpen ?? false) Get.back(); 
+      }
+    });
   }
 
 
@@ -77,7 +88,7 @@ class _AuthScreenState extends State<AuthScreen> {
       if (success) {
         SnackbarHelper.success('Welcome aboard! Redirecting to dashboard...');
 
-        await Future.delayed(const Duration(seconds: 3));
+        //await Future.delayed(const Duration(seconds: 3));
         Get.offAllNamed('/dashboard');
       } else {
         SnackbarHelper.error('Incorrect email or password!');

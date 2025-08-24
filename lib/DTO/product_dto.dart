@@ -1,5 +1,6 @@
 
 import 'package:qr_inventory_management/models/category_dropdown.dart';
+import 'package:qr_inventory_management/models/enums/product_status.dart';
 
 import '../models/product.dart';
 
@@ -18,7 +19,8 @@ class ProductDTO {
       sellingPrice: (json['selling_Price']),
       categoryId: json['categoryId'],
       category: CategoryDropdown.fromJson(json['category']),
-      userName: json['userName']
+      userName: json['userName'],
+      status: getProductStatus(json['status'])
     );
   }
 
